@@ -164,7 +164,7 @@ function NewAuditPage() {
         const chunk = parsedRows.slice(i, i + batchSize).map((row, idx) => ({
           audit_id: inserted.id,
           row_index: i + idx,
-          data: row,
+          data: row as unknown as Record<string, string | number | boolean | null>,
         }));
         const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
         if (itemErr) throw itemErr;
