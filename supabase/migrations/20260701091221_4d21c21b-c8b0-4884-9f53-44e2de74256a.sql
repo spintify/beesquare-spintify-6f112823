@@ -1,0 +1,1 @@
+UPDATE public.bill_counters SET value = 41 WHERE key = '26-27';
