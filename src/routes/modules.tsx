@@ -108,7 +108,7 @@ function ModulesPage() {
             title={<>AUDITING<br />APPLICATION</>}
             description="Track inventory, verify records, and manage audits"
             icon={<ClipboardCheck className="h-7 w-7" />}
-            onClick={() => navigate({ to: "/audit" })}
+            onClick={() => navigate({ to: "/auditing/dashboard" })}
           />
         </section>
       </main>
