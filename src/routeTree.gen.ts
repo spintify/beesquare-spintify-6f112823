@@ -17,7 +17,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as EstimateRouteImport } from './routes/estimate'
 import { Route as BuyersRouteImport } from './routes/buyers'
 import { Route as BillsRouteImport } from './routes/bills'
+import { Route as AuditingRouteImport } from './routes/auditing'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuditingIndexRouteImport } from './routes/auditing.index'
+import { Route as AuditingDashboardRouteImport } from './routes/auditing.dashboard'
 
 const SalesReportRoute = SalesReportRouteImport.update({
   id: '/sales-report',
@@ -59,14 +62,30 @@ const BillsRoute = BillsRouteImport.update({
   path: '/bills',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditingRoute = AuditingRouteImport.update({
+  id: '/auditing',
+  path: '/auditing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditingIndexRoute = AuditingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuditingRoute,
+} as any)
+const AuditingDashboardRoute = AuditingDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuditingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auditing': typeof AuditingRouteWithChildren
   '/bills': typeof BillsRoute
   '/buyers': typeof BuyersRoute
   '/estimate': typeof EstimateRoute
@@ -75,6 +94,8 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRoute
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
+  '/auditing/dashboard': typeof AuditingDashboardRoute
+  '/auditing/': typeof AuditingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,10 +107,13 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsRoute
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
+  '/auditing/dashboard': typeof AuditingDashboardRoute
+  '/auditing': typeof AuditingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auditing': typeof AuditingRouteWithChildren
   '/bills': typeof BillsRoute
   '/buyers': typeof BuyersRoute
   '/estimate': typeof EstimateRoute
@@ -98,11 +122,14 @@ export interface FileRoutesById {
   '/products': typeof ProductsRoute
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
+  '/auditing/dashboard': typeof AuditingDashboardRoute
+  '/auditing/': typeof AuditingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auditing'
     | '/bills'
     | '/buyers'
     | '/estimate'
@@ -111,6 +138,8 @@ export interface FileRouteTypes {
     | '/products'
     | '/purchase-report'
     | '/sales-report'
+    | '/auditing/dashboard'
+    | '/auditing/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,9 +151,12 @@ export interface FileRouteTypes {
     | '/products'
     | '/purchase-report'
     | '/sales-report'
+    | '/auditing/dashboard'
+    | '/auditing'
   id:
     | '__root__'
     | '/'
+    | '/auditing'
     | '/bills'
     | '/buyers'
     | '/estimate'
@@ -133,10 +165,13 @@ export interface FileRouteTypes {
     | '/products'
     | '/purchase-report'
     | '/sales-report'
+    | '/auditing/dashboard'
+    | '/auditing/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuditingRoute: typeof AuditingRouteWithChildren
   BillsRoute: typeof BillsRoute
   BuyersRoute: typeof BuyersRoute
   EstimateRoute: typeof EstimateRoute
@@ -205,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BillsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auditing': {
+      id: '/auditing'
+      path: '/auditing'
+      fullPath: '/auditing'
+      preLoaderRoute: typeof AuditingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -212,11 +254,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auditing/': {
+      id: '/auditing/'
+      path: '/'
+      fullPath: '/auditing/'
+      preLoaderRoute: typeof AuditingIndexRouteImport
+      parentRoute: typeof AuditingRoute
+    }
+    '/auditing/dashboard': {
+      id: '/auditing/dashboard'
+      path: '/dashboard'
+      fullPath: '/auditing/dashboard'
+      preLoaderRoute: typeof AuditingDashboardRouteImport
+      parentRoute: typeof AuditingRoute
+    }
   }
 }
 
+interface AuditingRouteChildren {
+  AuditingDashboardRoute: typeof AuditingDashboardRoute
+  AuditingIndexRoute: typeof AuditingIndexRoute
+}
+
+const AuditingRouteChildren: AuditingRouteChildren = {
+  AuditingDashboardRoute: AuditingDashboardRoute,
+  AuditingIndexRoute: AuditingIndexRoute,
+}
+
+const AuditingRouteWithChildren = AuditingRoute._addFileChildren(
+  AuditingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuditingRoute: AuditingRouteWithChildren,
   BillsRoute: BillsRoute,
   BuyersRoute: BuyersRoute,
   EstimateRoute: EstimateRoute,
