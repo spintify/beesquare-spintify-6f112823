@@ -86,7 +86,7 @@ function AuditLanding() {
             title="Start a New Audit"
             description="Begin a fresh inventory audit for OEM automobile parts. Create a new audit session and start verifying stock records."
             buttonLabel="Start Audit"
-            to="/audit/inventory"
+            to="/auditing/new-audit"
           />
           <ActionCard
             index={2}
