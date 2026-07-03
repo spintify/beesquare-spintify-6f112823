@@ -17,7 +17,7 @@ function NotFoundComponent() {
         </p>
         <div className="mt-6">
           <Link
-            to="/"
+            to="/modules"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Go home
@@ -33,8 +33,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Bee Square Enterprises — Billing" },
-      { name: "description", content: "Simple billing & invoicing for Bee Square Enterprises" },
+      { title: "Spintify — Billing & Auditing" },
+      { name: "description", content: "Spintify: complete billing & auditing for OEM parts dealers" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -42,7 +42,7 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap",
       },
     ],
   }),
@@ -63,6 +63,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+// Routes that belong to the billing module (get the billing AppHeader).
+const BILLING_PATHS = new Set([
+  "/",
+  "/estimate",
+  "/products",
+  "/buyers",
+  "/bills",
+  "/sales-report",
+  "/purchase-report",
+]);
+
+function isBillingPath(pathname: string) {
+  return BILLING_PATHS.has(pathname);
 }
 
 function RootComponent() {
@@ -105,12 +120,23 @@ function RootComponent() {
 
   if (!authed) return null;
 
+  // Billing routes keep the existing header + centered layout.
+  if (isBillingPath(location.pathname)) {
+    return (
+      <div className="min-h-screen">
+        <AppHeader />
+        <main className="mx-auto max-w-7xl px-6 py-8">
+          <Outlet />
+        </main>
+        <Toaster richColors position="top-right" />
+      </div>
+    );
+  }
+
+  // /modules and /audit/* provide their own chrome.
   return (
     <div className="min-h-screen">
-      <AppHeader />
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <Outlet />
-      </main>
+      <Outlet />
       <Toaster richColors position="top-right" />
     </div>
   );
