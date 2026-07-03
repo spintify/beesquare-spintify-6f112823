@@ -14,6 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_counters: {
+        Row: {
+          key: string
+          value: number
+        }
+        Insert: {
+          key: string
+          value?: number
+        }
+        Update: {
+          key?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      audit_items: {
+        Row: {
+          audit_id: string
+          created_at: string
+          data: Json
+          id: string
+          row_index: number
+        }
+        Insert: {
+          audit_id: string
+          created_at?: string
+          data?: Json
+          id?: string
+          row_index: number
+        }
+        Update: {
+          audit_id?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          row_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_items_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audits: {
+        Row: {
+          address_line1: string | null
+          alternate_mobile: string | null
+          audit_id: string
+          branch_name: string | null
+          city: string | null
+          contact_person: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          file_name: string | null
+          file_size: number | null
+          firm_name: string
+          gst_number: string
+          id: string
+          item_count: number
+          mobile_number: string
+          owner_name: string
+          pan_number: string | null
+          pincode: string
+          remarks: string | null
+          state: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address_line1?: string | null
+          alternate_mobile?: string | null
+          audit_id: string
+          branch_name?: string | null
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          firm_name: string
+          gst_number: string
+          id?: string
+          item_count?: number
+          mobile_number: string
+          owner_name: string
+          pan_number?: string | null
+          pincode: string
+          remarks?: string | null
+          state: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string | null
+          alternate_mobile?: string | null
+          audit_id?: string
+          branch_name?: string | null
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          firm_name?: string
+          gst_number?: string
+          id?: string
+          item_count?: number
+          mobile_number?: string
+          owner_name?: string
+          pan_number?: string | null
+          pincode?: string
+          remarks?: string | null
+          state?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bill_counters: {
         Row: {
           key: string
@@ -245,6 +370,7 @@ export type Database = {
         Args: { _delta: number; _product_id: string }
         Returns: undefined
       }
+      next_audit_id: { Args: never; Returns: string }
       next_bill_number: { Args: never; Returns: string }
       next_bill_number_for: { Args: { _fy: string }; Returns: number }
     }
