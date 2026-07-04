@@ -127,8 +127,8 @@ function EntryPage() {
           data: {
             "Part Number": r.partNumber,
             "Part Name": r.partName,
-            MRP: r.mrp,
-            "Quantity (Inventory)": r.qtyInventory,
+            MRP: r.mrp === "" ? null : toNum(r.mrp),
+            "Quantity (Inventory)": r.qtyInventory === "" ? null : toNum(r.qtyInventory),
             "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
             "Short QTY": c.shortQty || 0,
             "Excess QTY": c.excessQty || 0,
