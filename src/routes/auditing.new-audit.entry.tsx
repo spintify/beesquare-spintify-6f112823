@@ -75,8 +75,8 @@ function EntryPage() {
           itemId: it.id,
           partNumber: String(pickKey(d, ["Part Number", "part number", "partnumber", "product_id"]) || values[0] || ""),
           partName: String(pickKey(d, ["Part Name", "part name", "name", "product_name"]) || values[1] || ""),
-          mrp: toNum(pickKey(d, ["MRP", "mrp", "price"]) ?? values[3]),
-          qtyInventory: toNum(pickKey(d, ["Quantity (Inventory)", "quantity (inventory)", "qty inventory", "quantity", "qty"]) ?? values[4]),
+          mrp: String(pickKey(d, ["MRP", "mrp", "price"]) ?? values[3] ?? ""),
+          qtyInventory: String(pickKey(d, ["Quantity (Inventory)", "quantity (inventory)", "qty inventory", "quantity", "qty"]) ?? values[4] ?? ""),
           qtyCounted: "",
         };
       });
