@@ -284,7 +284,7 @@ function VerificationPage() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-white/10">
+          <div ref={tableScrollRef} className="overflow-x-auto rounded-xl border border-white/10">
             <table className="min-w-full text-sm">
               <thead className="bg-white/[0.06] text-sky-100/80 text-[11px] uppercase tracking-wider">
                 <tr>
