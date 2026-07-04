@@ -130,24 +130,26 @@ function EntryPage() {
   const onSave = async () => {
     setSaving(true);
     try {
-      const updates = rows.map((r) => {
+      const ops = rows.map((r, idx) => {
         const c = computeRow(r);
-        return supabase.from("audit_items").update({
-          data: {
-            "Part Number": r.partNumber,
-            "Part Name": r.partName,
-            MRP: r.mrp,
-            "Quantity (Inventory)": r.qtyInventory,
-            "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
-            "Short QTY": c.shortQty || 0,
-            "Excess QTY": c.excessQty || 0,
-            "Short Value": c.shortVal || 0,
-            "Excess Value": c.excessVal || 0,
-            "Variance in Values": c.variance || 0,
-          },
-        }).eq("id", r.itemId);
+        const data = {
+          "Part Number": r.partNumber,
+          "Part Name": r.partName,
+          MRP: r.mrp,
+          "Quantity (Inventory)": r.qtyInventory,
+          "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
+          "Short QTY": c.shortQty || 0,
+          "Excess QTY": c.excessQty || 0,
+          "Short Value": c.shortVal || 0,
+          "Excess Value": c.excessVal || 0,
+          "Variance in Values": c.variance || 0,
+        };
+        if (r.itemId.startsWith("new-")) {
+          return supabase.from("audit_items").insert({ audit_id: id, row_index: idx, data });
+        }
+        return supabase.from("audit_items").update({ data }).eq("id", r.itemId);
       });
-      await Promise.all(updates);
+      await Promise.all(ops);
       toast.success("Audit data saved");
       navigate({ to: "/auditing/new-audit/review", search: { id } });
     } catch (e) {
