@@ -171,8 +171,7 @@ function NewAuditPage() {
       }
 
       toast.success(`Audit ${inserted.audit_id} created`);
-      const url = `/auditing/new-audit/entry?id=${inserted.id}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+      navigate({ to: "/auditing/new-audit/review", search: { id: inserted.id } });
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to save audit");
