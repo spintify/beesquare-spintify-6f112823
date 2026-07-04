@@ -112,15 +112,16 @@ function VerificationPage() {
   }, [rows, query]);
 
   const totals = useMemo(() => {
-    let shortVal = 0, excessVal = 0, countedItems = 0;
+    let shortVal = 0, excessVal = 0, countedItems = 0, totalValue = 0;
     for (const r of rows) {
+      totalValue += r.mrp * r.inventoryQty;
       if (r.countedQty === "") continue;
       countedItems++;
       const counted = toNum(r.countedQty);
       shortVal += Math.max(0, r.inventoryQty - counted) * r.mrp;
       excessVal += Math.max(0, counted - r.inventoryQty) * r.mrp;
     }
-    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems };
+    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems, totalValue };
   }, [rows]);
 
   const setCounted = (itemId: string, value: string) => {
@@ -198,11 +199,13 @@ function VerificationPage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
           <Stat label="Total Items" value={rows.length.toString()} />
           <Stat label="Counted" value={`${totals.countedItems} / ${rows.length}`} />
+          <Stat label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} tone="sky" />
           <Stat label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
           <Stat label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <Stat label="Total Variance" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 md:p-6">
@@ -322,8 +325,8 @@ function Td({ children, align = "left", className = "" }: { children: React.Reac
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "emerald" }) {
-  const toneCls = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : "text-white";
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "emerald" | "sky" }) {
+  const toneCls = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : tone === "sky" ? "text-sky-300" : "text-white";
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-xl px-4 py-3">
       <p className="text-[11px] uppercase tracking-widest text-sky-100/60">{label}</p>
