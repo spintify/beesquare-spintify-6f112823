@@ -16,9 +16,9 @@ type Row = {
   itemId: string;
   partNumber: string;
   partName: string;
-  mrp: number;
-  qtyInventory: number;
-  qtyCounted: string; // user input
+  mrp: string;
+  qtyInventory: string;
+  qtyCounted: string;
 };
 
 const COLUMNS = [
