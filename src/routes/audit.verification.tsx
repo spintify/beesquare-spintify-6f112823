@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch } from "lucide-react";
 import { toast } from "sonner";
@@ -55,57 +55,6 @@ function VerificationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
-
-  // Sticky bottom horizontal scrollbar synced with the table container
-  const tableScrollRef = useRef<HTMLDivElement | null>(null);
-  const stickyScrollRef = useRef<HTMLDivElement | null>(null);
-  const stickyInnerRef = useRef<HTMLDivElement | null>(null);
-  const [scrollWidth, setScrollWidth] = useState(0);
-  const [needsStickyBar, setNeedsStickyBar] = useState(false);
-
-  useLayoutEffect(() => {
-    const el = tableScrollRef.current;
-    if (!el) return;
-    const update = () => {
-      setScrollWidth(el.scrollWidth);
-      setNeedsStickyBar(el.scrollWidth > el.clientWidth + 1);
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    Array.from(el.children).forEach((c) => ro.observe(c as Element));
-    window.addEventListener("resize", update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", update);
-    };
-  }, [rows.length, loading]);
-
-  useEffect(() => {
-    const src = tableScrollRef.current;
-    const proxy = stickyScrollRef.current;
-    if (!src || !proxy) return;
-    let syncing = false;
-    const onSrc = () => {
-      if (syncing) return;
-      syncing = true;
-      proxy.scrollLeft = src.scrollLeft;
-      syncing = false;
-    };
-    const onProxy = () => {
-      if (syncing) return;
-      syncing = true;
-      src.scrollLeft = proxy.scrollLeft;
-      syncing = false;
-    };
-    src.addEventListener("scroll", onSrc);
-    proxy.addEventListener("scroll", onProxy);
-    return () => {
-      src.removeEventListener("scroll", onSrc);
-      proxy.removeEventListener("scroll", onProxy);
-    };
-  }, [needsStickyBar]);
-
 
   useEffect(() => {
     (async () => {
@@ -284,7 +233,7 @@ function VerificationPage() {
             </p>
           </div>
 
-          <div ref={tableScrollRef} className="overflow-x-auto rounded-xl border border-white/10">
+          <div className="overflow-x-auto rounded-xl border border-white/10">
             <table className="min-w-full text-sm">
               <thead className="bg-white/[0.06] text-sky-100/80 text-[11px] uppercase tracking-wider">
                 <tr>
@@ -358,19 +307,6 @@ function VerificationPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Sticky horizontal scrollbar — always visible at bottom of viewport when table overflows */}
-          {needsStickyBar && (
-            <div
-              ref={stickyScrollRef}
-              className="fixed bottom-0 left-0 right-0 z-40 overflow-x-auto overflow-y-hidden border-t border-white/10 bg-[#050b1e]/90 backdrop-blur-md"
-              style={{ height: 16 }}
-              aria-hidden="true"
-            >
-              <div ref={stickyInnerRef} style={{ width: scrollWidth, height: 1 }} />
-            </div>
-          )}
-
 
           <div className="mt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
             <Link
