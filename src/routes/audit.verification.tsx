@@ -56,6 +56,57 @@ function VerificationPage() {
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
 
+  // Sticky bottom horizontal scrollbar synced with the table container
+  const tableScrollRef = useRef<HTMLDivElement | null>(null);
+  const stickyScrollRef = useRef<HTMLDivElement | null>(null);
+  const stickyInnerRef = useRef<HTMLDivElement | null>(null);
+  const [scrollWidth, setScrollWidth] = useState(0);
+  const [needsStickyBar, setNeedsStickyBar] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = tableScrollRef.current;
+    if (!el) return;
+    const update = () => {
+      setScrollWidth(el.scrollWidth);
+      setNeedsStickyBar(el.scrollWidth > el.clientWidth + 1);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    Array.from(el.children).forEach((c) => ro.observe(c as Element));
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [rows.length, loading]);
+
+  useEffect(() => {
+    const src = tableScrollRef.current;
+    const proxy = stickyScrollRef.current;
+    if (!src || !proxy) return;
+    let syncing = false;
+    const onSrc = () => {
+      if (syncing) return;
+      syncing = true;
+      proxy.scrollLeft = src.scrollLeft;
+      syncing = false;
+    };
+    const onProxy = () => {
+      if (syncing) return;
+      syncing = true;
+      src.scrollLeft = proxy.scrollLeft;
+      syncing = false;
+    };
+    src.addEventListener("scroll", onSrc);
+    proxy.addEventListener("scroll", onProxy);
+    return () => {
+      src.removeEventListener("scroll", onSrc);
+      proxy.removeEventListener("scroll", onProxy);
+    };
+  }, [needsStickyBar]);
+
+
   useEffect(() => {
     (async () => {
       setLoading(true);
