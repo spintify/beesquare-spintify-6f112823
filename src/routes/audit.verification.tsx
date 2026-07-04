@@ -311,9 +311,10 @@ function VerificationPage() {
           <div className="mt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
             <Link
               to="/auditing/new-audit"
+              search={{ editId: audit?.id }}
               className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm hover:bg-white/10"
             >
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> Back to Edit Info
             </Link>
             <button
               type="button"
