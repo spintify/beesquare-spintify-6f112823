@@ -100,6 +100,15 @@ function EntryPage() {
   const updateCounted = (idx: number, val: string) => {
     setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, qtyCounted: val } : r)));
   };
+  const updateField = <K extends keyof Row>(idx: number, key: K, val: Row[K]) => {
+    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, [key]: val } : r)));
+  };
+  const addRow = () => {
+    setRows((rs) => [
+      ...rs,
+      { itemId: `new-${Date.now()}-${rs.length}`, partNumber: "", partName: "", mrp: 0, qtyInventory: 0, qtyCounted: "" },
+    ]);
+  };
 
   const computeRow = (r: Row) => {
     if (r.qtyCounted === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
@@ -121,24 +130,26 @@ function EntryPage() {
   const onSave = async () => {
     setSaving(true);
     try {
-      const updates = rows.map((r) => {
+      const ops = rows.map((r, idx) => {
         const c = computeRow(r);
-        return supabase.from("audit_items").update({
-          data: {
-            "Part Number": r.partNumber,
-            "Part Name": r.partName,
-            MRP: r.mrp,
-            "Quantity (Inventory)": r.qtyInventory,
-            "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
-            "Short QTY": c.shortQty || 0,
-            "Excess QTY": c.excessQty || 0,
-            "Short Value": c.shortVal || 0,
-            "Excess Value": c.excessVal || 0,
-            "Variance in Values": c.variance || 0,
-          },
-        }).eq("id", r.itemId);
+        const data = {
+          "Part Number": r.partNumber,
+          "Part Name": r.partName,
+          MRP: r.mrp,
+          "Quantity (Inventory)": r.qtyInventory,
+          "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
+          "Short QTY": c.shortQty || 0,
+          "Excess QTY": c.excessQty || 0,
+          "Short Value": c.shortVal || 0,
+          "Excess Value": c.excessVal || 0,
+          "Variance in Values": c.variance || 0,
+        };
+        if (r.itemId.startsWith("new-")) {
+          return supabase.from("audit_items").insert({ audit_id: id, row_index: idx, data });
+        }
+        return supabase.from("audit_items").update({ data }).eq("id", r.itemId);
       });
-      await Promise.all(updates);
+      await Promise.all(ops);
       toast.success("Audit data saved");
       navigate({ to: "/auditing/new-audit/review", search: { id } });
     } catch (e) {
@@ -169,7 +180,7 @@ function EntryPage() {
           <div>
             <h2 className="text-3xl md:text-4xl font-black tracking-tight">Inventory Verification</h2>
             <p className="mt-2 text-sky-100/70 text-sm">
-              First 5 columns are auto-filled from your uploaded Excel. Enter the counted quantity to auto-calculate variance.
+              All cells are editable. First 5 columns are pre-filled from your uploaded Excel; last 5 auto-calculate.
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
@@ -186,8 +197,6 @@ function EntryPage() {
             <div className="flex items-center justify-center py-24 text-sky-100/70">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading inventory…
             </div>
-          ) : rows.length === 0 ? (
-            <div className="py-24 text-center text-sky-100/70">No rows found for this audit.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -207,17 +216,45 @@ function EntryPage() {
                     return (
                       <tr key={r.itemId} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <td className="px-3 py-2 text-sky-100/50">{idx + 1}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{r.partNumber}</td>
-                        <td className="px-3 py-2">{r.partName}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.mrp ? r.mrp.toFixed(2) : ""}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.qtyInventory || ""}</td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="text"
+                            value={r.partNumber}
+                            onChange={(e) => updateField(idx, "partNumber", e.target.value)}
+                            className="w-32 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="text"
+                            value={r.partName}
+                            onChange={(e) => updateField(idx, "partName", e.target.value)}
+                            className="w-48 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="number"
+                            value={r.mrp || ""}
+                            onChange={(e) => updateField(idx, "mrp", toNum(e.target.value))}
+                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="number"
+                            value={r.qtyInventory || ""}
+                            onChange={(e) => updateField(idx, "qtyInventory", toNum(e.target.value))}
+                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
                         <td className="px-2 py-1.5">
                           <input
                             type="number"
                             value={r.qtyCounted}
                             onChange={(e) => updateCounted(idx, e.target.value)}
                             placeholder="0"
-                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                            className="w-24 rounded-md border border-sky-400/30 bg-sky-500/[0.08] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
                           />
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums text-rose-300">{c.shortQty}</td>
@@ -230,6 +267,16 @@ function EntryPage() {
                   })}
                 </tbody>
               </table>
+              <div className="flex items-center justify-between p-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={addRow}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs hover:bg-white/10"
+                >
+                  + Add Row
+                </button>
+                <span className="text-xs text-sky-100/50">{rows.length} rows</span>
+              </div>
             </div>
           )}
         </div>
