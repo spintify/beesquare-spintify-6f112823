@@ -243,6 +243,7 @@ function VerificationPage() {
                   <Th align="right">Short Value</Th>
                   <Th align="right">Excess Value</Th>
                   <Th align="right">Variance</Th>
+                  <Th align="right" highlight>Outward</Th>
                 </tr>
               </thead>
               <tbody>
