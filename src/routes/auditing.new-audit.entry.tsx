@@ -207,18 +207,20 @@ function EntryPage() {
                     return (
                       <tr key={r.itemId} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <td className="px-3 py-2 text-sky-100/50">{idx + 1}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{r.partNumber}</td>
-                        <td className="px-3 py-2">{r.partName}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.mrp ? r.mrp.toFixed(2) : ""}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.qtyInventory || ""}</td>
                         <td className="px-2 py-1.5">
-                          <input
-                            type="number"
-                            value={r.qtyCounted}
-                            onChange={(e) => updateCounted(idx, e.target.value)}
-                            placeholder="0"
-                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
-                          />
+                          <EditCell value={r.partNumber} onChange={(v) => updateField(idx, "partNumber", v)} className="w-36" />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <EditCell value={r.partName} onChange={(v) => updateField(idx, "partName", v)} className="w-56" />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <EditCell value={r.mrp} onChange={(v) => updateField(idx, "mrp", v)} type="number" align="right" className="w-24" />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <EditCell value={r.qtyInventory} onChange={(v) => updateField(idx, "qtyInventory", v)} type="number" align="right" className="w-24" />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <EditCell value={r.qtyCounted} onChange={(v) => updateField(idx, "qtyCounted", v)} type="number" align="right" className="w-24" placeholder="0" />
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums text-rose-300">{c.shortQty}</td>
                         <td className="px-3 py-2 text-right tabular-nums text-emerald-300">{c.excessQty}</td>
