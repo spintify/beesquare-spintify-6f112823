@@ -325,8 +325,8 @@ function Td({ children, align = "left", className = "" }: { children: React.Reac
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "emerald" }) {
-  const toneCls = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : "text-white";
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "rose" | "emerald" | "sky" }) {
+  const toneCls = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : tone === "sky" ? "text-sky-300" : "text-white";
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-xl px-4 py-3">
       <p className="text-[11px] uppercase tracking-widest text-sky-100/60">{label}</p>
