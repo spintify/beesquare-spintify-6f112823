@@ -100,6 +100,15 @@ function EntryPage() {
   const updateCounted = (idx: number, val: string) => {
     setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, qtyCounted: val } : r)));
   };
+  const updateField = <K extends keyof Row>(idx: number, key: K, val: Row[K]) => {
+    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, [key]: val } : r)));
+  };
+  const addRow = () => {
+    setRows((rs) => [
+      ...rs,
+      { itemId: `new-${Date.now()}-${rs.length}`, partNumber: "", partName: "", mrp: 0, qtyInventory: 0, qtyCounted: "" },
+    ]);
+  };
 
   const computeRow = (r: Row) => {
     if (r.qtyCounted === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
