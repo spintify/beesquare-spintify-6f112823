@@ -289,9 +289,9 @@ function NewAuditPage() {
 
         {/* Title */}
         <section className="text-center pt-10 pb-6">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight">New Audit Information</h2>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight">{editId ? "Edit Audit Information" : "New Audit Information"}</h2>
           <p className="mt-3 text-sky-100/70 text-sm md:text-base">
-            Enter the required firm and audit details before beginning the inventory audit.
+            {editId ? "Update firm and audit details, then return to verification." : "Enter the required firm and audit details before beginning the inventory audit."}
           </p>
         </section>
 
