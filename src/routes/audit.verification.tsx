@@ -112,15 +112,16 @@ function VerificationPage() {
   }, [rows, query]);
 
   const totals = useMemo(() => {
-    let shortVal = 0, excessVal = 0, countedItems = 0;
+    let shortVal = 0, excessVal = 0, countedItems = 0, totalValue = 0;
     for (const r of rows) {
+      totalValue += r.mrp * r.inventoryQty;
       if (r.countedQty === "") continue;
       countedItems++;
       const counted = toNum(r.countedQty);
       shortVal += Math.max(0, r.inventoryQty - counted) * r.mrp;
       excessVal += Math.max(0, counted - r.inventoryQty) * r.mrp;
     }
-    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems };
+    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems, totalValue };
   }, [rows]);
 
   const setCounted = (itemId: string, value: string) => {
