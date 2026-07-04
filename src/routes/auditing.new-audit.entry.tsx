@@ -16,9 +16,9 @@ type Row = {
   itemId: string;
   partNumber: string;
   partName: string;
-  mrp: string;
-  qtyInventory: string;
-  qtyCounted: string;
+  mrp: number;
+  qtyInventory: number;
+  qtyCounted: string; // user input
 };
 
 const COLUMNS = [
@@ -75,8 +75,8 @@ function EntryPage() {
           itemId: it.id,
           partNumber: String(pickKey(d, ["Part Number", "part number", "partnumber", "product_id"]) || values[0] || ""),
           partName: String(pickKey(d, ["Part Name", "part name", "name", "product_name"]) || values[1] || ""),
-          mrp: String(pickKey(d, ["MRP", "mrp", "price"]) ?? values[3] ?? ""),
-          qtyInventory: String(pickKey(d, ["Quantity (Inventory)", "quantity (inventory)", "qty inventory", "quantity", "qty"]) ?? values[4] ?? ""),
+          mrp: toNum(pickKey(d, ["MRP", "mrp", "price"]) ?? values[3]),
+          qtyInventory: toNum(pickKey(d, ["Quantity (Inventory)", "quantity (inventory)", "qty inventory", "quantity", "qty"]) ?? values[4]),
           qtyCounted: "",
         };
       });
@@ -88,27 +88,27 @@ function EntryPage() {
   const totals = useMemo(() => {
     let shortQty = 0, excessQty = 0, shortVal = 0, excessVal = 0;
     for (const r of rows) {
-      if (r.qtyCounted === "" || r.qtyInventory === "") continue;
-      const mrp = toNum(r.mrp);
-      const diff = toNum(r.qtyCounted) - toNum(r.qtyInventory);
-      if (diff < 0) { shortQty += -diff; shortVal += -diff * mrp; }
-      else if (diff > 0) { excessQty += diff; excessVal += diff * mrp; }
+      const counted = r.qtyCounted === "" ? null : toNum(r.qtyCounted);
+      if (counted === null) continue;
+      const diff = counted - r.qtyInventory;
+      if (diff < 0) { shortQty += -diff; shortVal += -diff * r.mrp; }
+      else if (diff > 0) { excessQty += diff; excessVal += diff * r.mrp; }
     }
     return { shortQty, excessQty, shortVal, excessVal, variance: excessVal - shortVal };
   }, [rows]);
 
-  const updateField = (idx: number, key: keyof Row, val: string) => {
-    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, [key]: val } : r)));
+  const updateCounted = (idx: number, val: string) => {
+    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, qtyCounted: val } : r)));
   };
 
   const computeRow = (r: Row) => {
-    if (r.qtyCounted === "" || r.qtyInventory === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
-    const mrp = toNum(r.mrp);
-    const diff = toNum(r.qtyCounted) - toNum(r.qtyInventory);
+    if (r.qtyCounted === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
+    const counted = toNum(r.qtyCounted);
+    const diff = counted - r.qtyInventory;
     const shortQty = diff < 0 ? -diff : 0;
     const excessQty = diff > 0 ? diff : 0;
-    const shortVal = shortQty * mrp;
-    const excessVal = excessQty * mrp;
+    const shortVal = shortQty * r.mrp;
+    const excessVal = excessQty * r.mrp;
     return {
       shortQty: shortQty || "",
       excessQty: excessQty || "",
@@ -127,8 +127,8 @@ function EntryPage() {
           data: {
             "Part Number": r.partNumber,
             "Part Name": r.partName,
-            MRP: r.mrp === "" ? null : toNum(r.mrp),
-            "Quantity (Inventory)": r.qtyInventory === "" ? null : toNum(r.qtyInventory),
+            MRP: r.mrp,
+            "Quantity (Inventory)": r.qtyInventory,
             "Quantity (Counted)": r.qtyCounted === "" ? null : toNum(r.qtyCounted),
             "Short QTY": c.shortQty || 0,
             "Excess QTY": c.excessQty || 0,
@@ -207,20 +207,18 @@ function EntryPage() {
                     return (
                       <tr key={r.itemId} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <td className="px-3 py-2 text-sky-100/50">{idx + 1}</td>
+                        <td className="px-3 py-2 whitespace-nowrap">{r.partNumber}</td>
+                        <td className="px-3 py-2">{r.partName}</td>
+                        <td className="px-3 py-2 text-right tabular-nums">{r.mrp ? r.mrp.toFixed(2) : ""}</td>
+                        <td className="px-3 py-2 text-right tabular-nums">{r.qtyInventory || ""}</td>
                         <td className="px-2 py-1.5">
-                          <EditCell value={r.partNumber} onChange={(v) => updateField(idx, "partNumber", v)} className="w-36" />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <EditCell value={r.partName} onChange={(v) => updateField(idx, "partName", v)} className="w-56" />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <EditCell value={r.mrp} onChange={(v) => updateField(idx, "mrp", v)} type="number" align="right" className="w-24" />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <EditCell value={r.qtyInventory} onChange={(v) => updateField(idx, "qtyInventory", v)} type="number" align="right" className="w-24" />
-                        </td>
-                        <td className="px-2 py-1.5">
-                          <EditCell value={r.qtyCounted} onChange={(v) => updateField(idx, "qtyCounted", v)} type="number" align="right" className="w-24" placeholder="0" />
+                          <input
+                            type="number"
+                            value={r.qtyCounted}
+                            onChange={(e) => updateCounted(idx, e.target.value)}
+                            placeholder="0"
+                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums text-rose-300">{c.shortQty}</td>
                         <td className="px-3 py-2 text-right tabular-nums text-emerald-300">{c.excessQty}</td>
@@ -276,31 +274,5 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: "ros
       <p className="text-[10px] uppercase tracking-widest text-sky-100/60">{label}</p>
       <p className="mt-0.5 text-sm font-semibold tabular-nums">{value}</p>
     </div>
-  );
-}
-
-function EditCell({
-  value,
-  onChange,
-  type = "text",
-  align = "left",
-  className = "",
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  type?: "text" | "number";
-  align?: "left" | "right";
-  className?: string;
-  placeholder?: string;
-}) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className={`${className} ${align === "right" ? "text-right tabular-nums" : "text-left"} rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]`}
-    />
   );
 }
