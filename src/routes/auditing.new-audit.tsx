@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { FileSpreadsheet, Upload, X, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 
+const searchSchema = z.object({ editId: z.string().uuid().optional() });
+
 export const Route = createFileRoute("/auditing/new-audit")({
+  validateSearch: (s) => searchSchema.parse(s),
   component: NewAuditPage,
 });
 
@@ -33,6 +36,7 @@ const ACCEPTED = [".xlsx", ".xls", ".csv"];
 
 function NewAuditPage() {
   const navigate = useNavigate();
+  const { editId } = Route.useSearch();
   const [form, setForm] = useState<FormState>({
     firm_name: "",
     owner_name: "",
@@ -55,7 +59,37 @@ function NewAuditPage() {
   const [parsedRows, setParsedRows] = useState<Record<string, unknown>[] | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [existingFileName, setExistingFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!editId) return;
+    (async () => {
+      setLoadingEdit(true);
+      const { data } = await supabase.from("audits").select("*").eq("id", editId).maybeSingle();
+      if (data) {
+        setForm({
+          firm_name: String(data.firm_name ?? ""),
+          owner_name: String(data.owner_name ?? ""),
+          gst_number: String(data.gst_number ?? ""),
+          pan_number: String(data.pan_number ?? ""),
+          mobile_number: String(data.mobile_number ?? ""),
+          alternate_mobile: String(data.alternate_mobile ?? ""),
+          contact_person: String(data.contact_person ?? ""),
+          email: String(data.email ?? ""),
+          state: String(data.state ?? ""),
+          branch_name: String(data.branch_name ?? ""),
+          address_line1: String(data.address_line1 ?? ""),
+          city: String(data.city ?? ""),
+          pincode: String(data.pincode ?? ""),
+          remarks: String(data.remarks ?? ""),
+        });
+        setExistingFileName(data.file_name ? String(data.file_name) : null);
+      }
+      setLoadingEdit(false);
+    })();
+  }, [editId]);
 
   const setField = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -117,61 +151,105 @@ function NewAuditPage() {
       toast.error("Please fix the highlighted fields");
       return;
     }
-    if (!file || !parsedRows) {
+    if (!editId && (!file || !parsedRows)) {
       toast.error("Please upload an inventory file (.xlsx or .csv)");
       return;
     }
 
     setSubmitting(true);
     try {
-      const { data: auditIdData, error: idErr } = await supabase.rpc("next_audit_id");
-      if (idErr) throw idErr;
-      const auditId = auditIdData as string;
+      if (editId) {
+        // Update existing audit
+        const { error: updErr } = await supabase
+          .from("audits")
+          .update({
+            firm_name: form.firm_name,
+            owner_name: form.owner_name,
+            gst_number: form.gst_number,
+            pan_number: form.pan_number || null,
+            mobile_number: form.mobile_number,
+            alternate_mobile: form.alternate_mobile || null,
+            contact_person: form.contact_person || null,
+            email: form.email || null,
+            state: form.state,
+            branch_name: form.branch_name || null,
+            address_line1: form.address_line1 || null,
+            city: form.city || null,
+            pincode: form.pincode,
+            remarks: form.remarks || null,
+            ...(file && parsedRows ? { file_name: file.name, file_size: file.size, item_count: parsedRows.length } : {}),
+          })
+          .eq("id", editId);
+        if (updErr) throw updErr;
 
-      const { data: userData } = await supabase.auth.getUser();
+        // If a new file was uploaded, replace items
+        if (file && parsedRows) {
+          await supabase.from("audit_items").delete().eq("audit_id", editId);
+          const batchSize = 500;
+          for (let i = 0; i < parsedRows.length; i += batchSize) {
+            const chunk = parsedRows.slice(i, i + batchSize).map((row, idx) => ({
+              audit_id: editId,
+              row_index: i + idx,
+              data: row as unknown as Record<string, string | number | boolean | null>,
+            }));
+            const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
+            if (itemErr) throw itemErr;
+          }
+        }
 
-      const { data: inserted, error: insErr } = await supabase
-        .from("audits")
-        .insert({
-          audit_id: auditId,
-          firm_name: form.firm_name,
-          owner_name: form.owner_name,
-          gst_number: form.gst_number,
-          pan_number: form.pan_number || null,
-          mobile_number: form.mobile_number,
-          alternate_mobile: form.alternate_mobile || null,
-          contact_person: form.contact_person || null,
-          email: form.email || null,
-          state: form.state,
-          branch_name: form.branch_name || null,
-          address_line1: form.address_line1 || null,
-          city: form.city || null,
-          pincode: form.pincode,
-          remarks: form.remarks || null,
-          file_name: file.name,
-          file_size: file.size,
-          item_count: parsedRows.length,
-          status: "draft",
-          created_by: userData.user?.id ?? null,
-        })
-        .select("id, audit_id")
-        .single();
-      if (insErr) throw insErr;
+        toast.success("Audit updated successfully");
+        navigate({ to: "/audit/verification", search: { id: editId } });
+      } else {
+        // Create new audit
+        const { data: auditIdData, error: idErr } = await supabase.rpc("next_audit_id");
+        if (idErr) throw idErr;
+        const auditId = auditIdData as string;
 
-      // Batch insert items
-      const batchSize = 500;
-      for (let i = 0; i < parsedRows.length; i += batchSize) {
-        const chunk = parsedRows.slice(i, i + batchSize).map((row, idx) => ({
-          audit_id: inserted.id,
-          row_index: i + idx,
-          data: row as unknown as Record<string, string | number | boolean | null>,
-        }));
-        const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
-        if (itemErr) throw itemErr;
+        const { data: userData } = await supabase.auth.getUser();
+
+        const { data: inserted, error: insErr } = await supabase
+          .from("audits")
+          .insert({
+            audit_id: auditId,
+            firm_name: form.firm_name,
+            owner_name: form.owner_name,
+            gst_number: form.gst_number,
+            pan_number: form.pan_number || null,
+            mobile_number: form.mobile_number,
+            alternate_mobile: form.alternate_mobile || null,
+            contact_person: form.contact_person || null,
+            email: form.email || null,
+            state: form.state,
+            branch_name: form.branch_name || null,
+            address_line1: form.address_line1 || null,
+            city: form.city || null,
+            pincode: form.pincode,
+            remarks: form.remarks || null,
+            file_name: file!.name,
+            file_size: file!.size,
+            item_count: parsedRows!.length,
+            status: "draft",
+            created_by: userData.user?.id ?? null,
+          })
+          .select("id, audit_id")
+          .single();
+        if (insErr) throw insErr;
+
+        // Batch insert items
+        const batchSize = 500;
+        for (let i = 0; i < parsedRows!.length; i += batchSize) {
+          const chunk = parsedRows!.slice(i, i + batchSize).map((row, idx) => ({
+            audit_id: inserted.id,
+            row_index: i + idx,
+            data: row as unknown as Record<string, string | number | boolean | null>,
+          }));
+          const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
+          if (itemErr) throw itemErr;
+        }
+
+        toast.success(`Audit ${inserted.audit_id} created`);
+        navigate({ to: "/audit/verification", search: { id: inserted.id } });
       }
-
-      toast.success(`Audit ${inserted.audit_id} created`);
-      navigate({ to: "/audit/verification", search: { id: inserted.id } });
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to save audit");
@@ -199,7 +277,7 @@ function NewAuditPage() {
         {/* Header */}
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl px-6 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
           <div className="min-w-0">
-            <h1 className="text-lg font-semibold leading-tight">Start New Audit</h1>
+            <h1 className="text-lg font-semibold leading-tight">{editId ? "Edit Audit" : "Start New Audit"}</h1>
             <p className="text-[11px] tracking-widest text-sky-200/60">BEE SQUARE ENTERPRISES</p>
           </div>
           <nav className="flex items-center gap-6 text-sm text-sky-100/80">
@@ -211,9 +289,9 @@ function NewAuditPage() {
 
         {/* Title */}
         <section className="text-center pt-10 pb-6">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight">New Audit Information</h2>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight">{editId ? "Edit Audit Information" : "New Audit Information"}</h2>
           <p className="mt-3 text-sky-100/70 text-sm md:text-base">
-            Enter the required firm and audit details before beginning the inventory audit.
+            {editId ? "Update firm and audit details, then return to verification." : "Enter the required firm and audit details before beginning the inventory audit."}
           </p>
         </section>
 
