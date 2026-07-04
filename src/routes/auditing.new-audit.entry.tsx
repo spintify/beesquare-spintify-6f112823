@@ -178,7 +178,7 @@ function EntryPage() {
           <div>
             <h2 className="text-3xl md:text-4xl font-black tracking-tight">Inventory Verification</h2>
             <p className="mt-2 text-sky-100/70 text-sm">
-              First 5 columns are auto-filled from your uploaded Excel. Enter the counted quantity to auto-calculate variance.
+              All cells are editable. First 5 columns are pre-filled from your uploaded Excel; last 5 auto-calculate.
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
