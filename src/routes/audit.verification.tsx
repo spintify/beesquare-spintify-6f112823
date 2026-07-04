@@ -359,6 +359,19 @@ function VerificationPage() {
             </table>
           </div>
 
+          {/* Sticky horizontal scrollbar — always visible at bottom of viewport when table overflows */}
+          {needsStickyBar && (
+            <div
+              ref={stickyScrollRef}
+              className="fixed bottom-0 left-0 right-0 z-40 overflow-x-auto overflow-y-hidden border-t border-white/10 bg-[#050b1e]/90 backdrop-blur-md"
+              style={{ height: 16 }}
+              aria-hidden="true"
+            >
+              <div ref={stickyInnerRef} style={{ width: scrollWidth, height: 1 }} />
+            </div>
+          )}
+
+
           <div className="mt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
             <Link
               to="/auditing/new-audit"
