@@ -27,6 +27,7 @@ import { Route as AuditReportsRouteImport } from './routes/audit.reports'
 import { Route as AuditReconciliationRouteImport } from './routes/audit.reconciliation'
 import { Route as AuditInventoryRouteImport } from './routes/audit.inventory'
 import { Route as AuditHistoryRouteImport } from './routes/audit.history'
+import { Route as AuditingNewAuditVerifyRouteImport } from './routes/auditing.new-audit.verify'
 import { Route as AuditingNewAuditReviewRouteImport } from './routes/auditing.new-audit.review'
 
 const SalesReportRoute = SalesReportRouteImport.update({
@@ -119,6 +120,11 @@ const AuditHistoryRoute = AuditHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuditRoute,
 } as any)
+const AuditingNewAuditVerifyRoute = AuditingNewAuditVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuditingNewAuditRoute,
+} as any)
 const AuditingNewAuditReviewRoute = AuditingNewAuditReviewRouteImport.update({
   id: '/review',
   path: '/review',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/auditing/new-audit': typeof AuditingNewAuditRouteWithChildren
   '/audit/': typeof AuditIndexRoute
   '/auditing/new-audit/review': typeof AuditingNewAuditReviewRoute
+  '/auditing/new-audit/verify': typeof AuditingNewAuditVerifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/auditing/new-audit': typeof AuditingNewAuditRouteWithChildren
   '/audit': typeof AuditIndexRoute
   '/auditing/new-audit/review': typeof AuditingNewAuditReviewRoute
+  '/auditing/new-audit/verify': typeof AuditingNewAuditVerifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/auditing/new-audit': typeof AuditingNewAuditRouteWithChildren
   '/audit/': typeof AuditIndexRoute
   '/auditing/new-audit/review': typeof AuditingNewAuditReviewRoute
+  '/auditing/new-audit/verify': typeof AuditingNewAuditVerifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/auditing/new-audit'
     | '/audit/'
     | '/auditing/new-audit/review'
+    | '/auditing/new-audit/verify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/auditing/new-audit'
     | '/audit'
     | '/auditing/new-audit/review'
+    | '/auditing/new-audit/verify'
   id:
     | '__root__'
     | '/'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/auditing/new-audit'
     | '/audit/'
     | '/auditing/new-audit/review'
+    | '/auditing/new-audit/verify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditHistoryRouteImport
       parentRoute: typeof AuditRoute
     }
+    '/auditing/new-audit/verify': {
+      id: '/auditing/new-audit/verify'
+      path: '/verify'
+      fullPath: '/auditing/new-audit/verify'
+      preLoaderRoute: typeof AuditingNewAuditVerifyRouteImport
+      parentRoute: typeof AuditingNewAuditRoute
+    }
     '/auditing/new-audit/review': {
       id: '/auditing/new-audit/review'
       path: '/review'
@@ -429,10 +448,12 @@ const AuditRouteWithChildren = AuditRoute._addFileChildren(AuditRouteChildren)
 
 interface AuditingNewAuditRouteChildren {
   AuditingNewAuditReviewRoute: typeof AuditingNewAuditReviewRoute
+  AuditingNewAuditVerifyRoute: typeof AuditingNewAuditVerifyRoute
 }
 
 const AuditingNewAuditRouteChildren: AuditingNewAuditRouteChildren = {
   AuditingNewAuditReviewRoute: AuditingNewAuditReviewRoute,
+  AuditingNewAuditVerifyRoute: AuditingNewAuditVerifyRoute,
 }
 
 const AuditingNewAuditRouteWithChildren =
