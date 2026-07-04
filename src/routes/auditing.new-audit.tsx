@@ -171,7 +171,7 @@ function NewAuditPage() {
       }
 
       toast.success(`Audit ${inserted.audit_id} created`);
-      navigate({ to: "/auditing/new-audit/verify", search: { id: inserted.id } });
+      navigate({ to: "/audit/verification", search: { id: inserted.id } });
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to save audit");
