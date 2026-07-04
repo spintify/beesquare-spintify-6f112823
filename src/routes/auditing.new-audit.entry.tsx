@@ -88,27 +88,27 @@ function EntryPage() {
   const totals = useMemo(() => {
     let shortQty = 0, excessQty = 0, shortVal = 0, excessVal = 0;
     for (const r of rows) {
-      const counted = r.qtyCounted === "" ? null : toNum(r.qtyCounted);
-      if (counted === null) continue;
-      const diff = counted - r.qtyInventory;
-      if (diff < 0) { shortQty += -diff; shortVal += -diff * r.mrp; }
-      else if (diff > 0) { excessQty += diff; excessVal += diff * r.mrp; }
+      if (r.qtyCounted === "" || r.qtyInventory === "") continue;
+      const mrp = toNum(r.mrp);
+      const diff = toNum(r.qtyCounted) - toNum(r.qtyInventory);
+      if (diff < 0) { shortQty += -diff; shortVal += -diff * mrp; }
+      else if (diff > 0) { excessQty += diff; excessVal += diff * mrp; }
     }
     return { shortQty, excessQty, shortVal, excessVal, variance: excessVal - shortVal };
   }, [rows]);
 
-  const updateCounted = (idx: number, val: string) => {
-    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, qtyCounted: val } : r)));
+  const updateField = (idx: number, key: keyof Row, val: string) => {
+    setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, [key]: val } : r)));
   };
 
   const computeRow = (r: Row) => {
-    if (r.qtyCounted === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
-    const counted = toNum(r.qtyCounted);
-    const diff = counted - r.qtyInventory;
+    if (r.qtyCounted === "" || r.qtyInventory === "") return { shortQty: "", excessQty: "", shortVal: "", excessVal: "", variance: "" };
+    const mrp = toNum(r.mrp);
+    const diff = toNum(r.qtyCounted) - toNum(r.qtyInventory);
     const shortQty = diff < 0 ? -diff : 0;
     const excessQty = diff > 0 ? diff : 0;
-    const shortVal = shortQty * r.mrp;
-    const excessVal = excessQty * r.mrp;
+    const shortVal = shortQty * mrp;
+    const excessVal = excessQty * mrp;
     return {
       shortQty: shortQty || "",
       excessQty: excessQty || "",
