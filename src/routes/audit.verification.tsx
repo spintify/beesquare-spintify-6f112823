@@ -161,6 +161,7 @@ function VerificationPage() {
                 "Short Values": shortQ * r.mrp,
                 "Excess Values": excessQ * r.mrp,
                 "Variance in Values": excessQ * r.mrp - shortQ * r.mrp,
+                "Outward": toNum(r.outwardQty),
               },
             })
             .eq("id", r.itemId);
