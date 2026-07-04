@@ -195,8 +195,6 @@ function EntryPage() {
             <div className="flex items-center justify-center py-24 text-sky-100/70">
               <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading inventory…
             </div>
-          ) : rows.length === 0 ? (
-            <div className="py-24 text-center text-sky-100/70">No rows found for this audit.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -216,17 +214,45 @@ function EntryPage() {
                     return (
                       <tr key={r.itemId} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <td className="px-3 py-2 text-sky-100/50">{idx + 1}</td>
-                        <td className="px-3 py-2 whitespace-nowrap">{r.partNumber}</td>
-                        <td className="px-3 py-2">{r.partName}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.mrp ? r.mrp.toFixed(2) : ""}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{r.qtyInventory || ""}</td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="text"
+                            value={r.partNumber}
+                            onChange={(e) => updateField(idx, "partNumber", e.target.value)}
+                            className="w-32 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="text"
+                            value={r.partName}
+                            onChange={(e) => updateField(idx, "partName", e.target.value)}
+                            className="w-48 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="number"
+                            value={r.mrp || ""}
+                            onChange={(e) => updateField(idx, "mrp", toNum(e.target.value))}
+                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
+                        <td className="px-2 py-1.5">
+                          <input
+                            type="number"
+                            value={r.qtyInventory || ""}
+                            onChange={(e) => updateField(idx, "qtyInventory", toNum(e.target.value))}
+                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </td>
                         <td className="px-2 py-1.5">
                           <input
                             type="number"
                             value={r.qtyCounted}
                             onChange={(e) => updateCounted(idx, e.target.value)}
                             placeholder="0"
-                            className="w-24 rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                            className="w-24 rounded-md border border-sky-400/30 bg-sky-500/[0.08] px-2 py-1 text-right text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
                           />
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums text-rose-300">{c.shortQty}</td>
@@ -239,6 +265,16 @@ function EntryPage() {
                   })}
                 </tbody>
               </table>
+              <div className="flex items-center justify-between p-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={addRow}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs hover:bg-white/10"
+                >
+                  + Add Row
+                </button>
+                <span className="text-xs text-sky-100/50">{rows.length} rows</span>
+              </div>
             </div>
           )}
         </div>
