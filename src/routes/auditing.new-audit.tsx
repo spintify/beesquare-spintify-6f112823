@@ -36,6 +36,7 @@ const ACCEPTED = [".xlsx", ".xls", ".csv"];
 
 function NewAuditPage() {
   const navigate = useNavigate();
+  const { editId } = Route.useSearch();
   const [form, setForm] = useState<FormState>({
     firm_name: "",
     owner_name: "",
@@ -58,7 +59,37 @@ function NewAuditPage() {
   const [parsedRows, setParsedRows] = useState<Record<string, unknown>[] | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [existingFileName, setExistingFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!editId) return;
+    (async () => {
+      setLoadingEdit(true);
+      const { data } = await supabase.from("audits").select("*").eq("id", editId).maybeSingle();
+      if (data) {
+        setForm({
+          firm_name: String(data.firm_name ?? ""),
+          owner_name: String(data.owner_name ?? ""),
+          gst_number: String(data.gst_number ?? ""),
+          pan_number: String(data.pan_number ?? ""),
+          mobile_number: String(data.mobile_number ?? ""),
+          alternate_mobile: String(data.alternate_mobile ?? ""),
+          contact_person: String(data.contact_person ?? ""),
+          email: String(data.email ?? ""),
+          state: String(data.state ?? ""),
+          branch_name: String(data.branch_name ?? ""),
+          address_line1: String(data.address_line1 ?? ""),
+          city: String(data.city ?? ""),
+          pincode: String(data.pincode ?? ""),
+          remarks: String(data.remarks ?? ""),
+        });
+        setExistingFileName(data.file_name ? String(data.file_name) : null);
+      }
+      setLoadingEdit(false);
+    })();
+  }, [editId]);
 
   const setField = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
