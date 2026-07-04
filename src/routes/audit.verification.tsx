@@ -199,11 +199,13 @@ function VerificationPage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
           <Stat label="Total Items" value={rows.length.toString()} />
           <Stat label="Counted" value={`${totals.countedItems} / ${rows.length}`} />
+          <Stat label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} tone="sky" />
           <Stat label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
           <Stat label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <Stat label="Total Variance" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 md:p-6">
