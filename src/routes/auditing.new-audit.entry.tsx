@@ -278,3 +278,29 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: "ros
     </div>
   );
 }
+
+function EditCell({
+  value,
+  onChange,
+  type = "text",
+  align = "left",
+  className = "",
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  type?: "text" | "number";
+  align?: "left" | "right";
+  className?: string;
+  placeholder?: string;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className={`${className} ${align === "right" ? "text-right tabular-nums" : "text-left"} rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-sm text-white outline-none transition-all focus:border-sky-400/60 focus:bg-white/[0.08] focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]`}
+    />
+  );
+}
