@@ -219,8 +219,6 @@ function NewAuditPage() {
 
         {/* Wizard container */}
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 md:p-8 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-          <StepBar current={1} />
-
           {/* Section 1 */}
           <h3 className="mt-8 text-lg font-semibold">Section 1 &mdash; Firm Information</h3>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
