@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch } from "lucide-react";
 import { toast } from "sonner";
