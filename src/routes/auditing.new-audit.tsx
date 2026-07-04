@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { FileSpreadsheet, Upload, X, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 
+const searchSchema = z.object({ editId: z.string().uuid().optional() });
+
 export const Route = createFileRoute("/auditing/new-audit")({
+  validateSearch: (s) => searchSchema.parse(s),
   component: NewAuditPage,
 });
 
