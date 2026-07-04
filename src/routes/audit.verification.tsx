@@ -99,6 +99,7 @@ function VerificationPage() {
           mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           countedQty: String(pick(d, ["Quantity Counted"]) || ""),
+          outwardQty: String(pick(d, ["Outward"]) || ""),
         };
       });
       setRows(mapped);
