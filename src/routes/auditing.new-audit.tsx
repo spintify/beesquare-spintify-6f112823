@@ -277,7 +277,7 @@ function NewAuditPage() {
         {/* Header */}
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl px-6 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
           <div className="min-w-0">
-            <h1 className="text-lg font-semibold leading-tight">Start New Audit</h1>
+            <h1 className="text-lg font-semibold leading-tight">{editId ? "Edit Audit" : "Start New Audit"}</h1>
             <p className="text-[11px] tracking-widest text-sky-200/60">BEE SQUARE ENTERPRISES</p>
           </div>
           <nav className="flex items-center gap-6 text-sm text-sky-100/80">
