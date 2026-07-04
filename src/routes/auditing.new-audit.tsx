@@ -151,61 +151,105 @@ function NewAuditPage() {
       toast.error("Please fix the highlighted fields");
       return;
     }
-    if (!file || !parsedRows) {
+    if (!editId && (!file || !parsedRows)) {
       toast.error("Please upload an inventory file (.xlsx or .csv)");
       return;
     }
 
     setSubmitting(true);
     try {
-      const { data: auditIdData, error: idErr } = await supabase.rpc("next_audit_id");
-      if (idErr) throw idErr;
-      const auditId = auditIdData as string;
+      if (editId) {
+        // Update existing audit
+        const { error: updErr } = await supabase
+          .from("audits")
+          .update({
+            firm_name: form.firm_name,
+            owner_name: form.owner_name,
+            gst_number: form.gst_number,
+            pan_number: form.pan_number || null,
+            mobile_number: form.mobile_number,
+            alternate_mobile: form.alternate_mobile || null,
+            contact_person: form.contact_person || null,
+            email: form.email || null,
+            state: form.state,
+            branch_name: form.branch_name || null,
+            address_line1: form.address_line1 || null,
+            city: form.city || null,
+            pincode: form.pincode,
+            remarks: form.remarks || null,
+            ...(file && parsedRows ? { file_name: file.name, file_size: file.size, item_count: parsedRows.length } : {}),
+          })
+          .eq("id", editId);
+        if (updErr) throw updErr;
 
-      const { data: userData } = await supabase.auth.getUser();
+        // If a new file was uploaded, replace items
+        if (file && parsedRows) {
+          await supabase.from("audit_items").delete().eq("audit_id", editId);
+          const batchSize = 500;
+          for (let i = 0; i < parsedRows.length; i += batchSize) {
+            const chunk = parsedRows.slice(i, i + batchSize).map((row, idx) => ({
+              audit_id: editId,
+              row_index: i + idx,
+              data: row as unknown as Record<string, string | number | boolean | null>,
+            }));
+            const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
+            if (itemErr) throw itemErr;
+          }
+        }
 
-      const { data: inserted, error: insErr } = await supabase
-        .from("audits")
-        .insert({
-          audit_id: auditId,
-          firm_name: form.firm_name,
-          owner_name: form.owner_name,
-          gst_number: form.gst_number,
-          pan_number: form.pan_number || null,
-          mobile_number: form.mobile_number,
-          alternate_mobile: form.alternate_mobile || null,
-          contact_person: form.contact_person || null,
-          email: form.email || null,
-          state: form.state,
-          branch_name: form.branch_name || null,
-          address_line1: form.address_line1 || null,
-          city: form.city || null,
-          pincode: form.pincode,
-          remarks: form.remarks || null,
-          file_name: file.name,
-          file_size: file.size,
-          item_count: parsedRows.length,
-          status: "draft",
-          created_by: userData.user?.id ?? null,
-        })
-        .select("id, audit_id")
-        .single();
-      if (insErr) throw insErr;
+        toast.success("Audit updated successfully");
+        navigate({ to: "/audit/verification", search: { id: editId } });
+      } else {
+        // Create new audit
+        const { data: auditIdData, error: idErr } = await supabase.rpc("next_audit_id");
+        if (idErr) throw idErr;
+        const auditId = auditIdData as string;
 
-      // Batch insert items
-      const batchSize = 500;
-      for (let i = 0; i < parsedRows.length; i += batchSize) {
-        const chunk = parsedRows.slice(i, i + batchSize).map((row, idx) => ({
-          audit_id: inserted.id,
-          row_index: i + idx,
-          data: row as unknown as Record<string, string | number | boolean | null>,
-        }));
-        const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
-        if (itemErr) throw itemErr;
+        const { data: userData } = await supabase.auth.getUser();
+
+        const { data: inserted, error: insErr } = await supabase
+          .from("audits")
+          .insert({
+            audit_id: auditId,
+            firm_name: form.firm_name,
+            owner_name: form.owner_name,
+            gst_number: form.gst_number,
+            pan_number: form.pan_number || null,
+            mobile_number: form.mobile_number,
+            alternate_mobile: form.alternate_mobile || null,
+            contact_person: form.contact_person || null,
+            email: form.email || null,
+            state: form.state,
+            branch_name: form.branch_name || null,
+            address_line1: form.address_line1 || null,
+            city: form.city || null,
+            pincode: form.pincode,
+            remarks: form.remarks || null,
+            file_name: file!.name,
+            file_size: file!.size,
+            item_count: parsedRows!.length,
+            status: "draft",
+            created_by: userData.user?.id ?? null,
+          })
+          .select("id, audit_id")
+          .single();
+        if (insErr) throw insErr;
+
+        // Batch insert items
+        const batchSize = 500;
+        for (let i = 0; i < parsedRows!.length; i += batchSize) {
+          const chunk = parsedRows!.slice(i, i + batchSize).map((row, idx) => ({
+            audit_id: inserted.id,
+            row_index: i + idx,
+            data: row as unknown as Record<string, string | number | boolean | null>,
+          }));
+          const { error: itemErr } = await supabase.from("audit_items").insert(chunk);
+          if (itemErr) throw itemErr;
+        }
+
+        toast.success(`Audit ${inserted.audit_id} created`);
+        navigate({ to: "/audit/verification", search: { id: inserted.id } });
       }
-
-      toast.success(`Audit ${inserted.audit_id} created`);
-      navigate({ to: "/audit/verification", search: { id: inserted.id } });
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to save audit");
