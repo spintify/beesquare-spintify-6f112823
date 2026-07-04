@@ -131,6 +131,11 @@ function VerificationPage() {
     setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, countedQty: value } : r)));
   };
 
+  const setOutward = (itemId: string, value: string) => {
+    if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+    setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, outwardQty: value } : r)));
+  };
+
   const onFinish = async () => {
     if (!audit) return;
     setSaving(true);
