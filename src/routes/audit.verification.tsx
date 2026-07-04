@@ -20,6 +20,7 @@ type Row = {
   mrp: number;
   inventoryQty: number;
   countedQty: string;
+  outwardQty: string;
 };
 
 function pick(row: Record<string, unknown>, keys: string[]): unknown {
@@ -98,6 +99,7 @@ function VerificationPage() {
           mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           countedQty: String(pick(d, ["Quantity Counted"]) || ""),
+          outwardQty: String(pick(d, ["Outward"]) || ""),
         };
       });
       setRows(mapped);
@@ -129,6 +131,11 @@ function VerificationPage() {
     setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, countedQty: value } : r)));
   };
 
+  const setOutward = (itemId: string, value: string) => {
+    if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+    setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, outwardQty: value } : r)));
+  };
+
   const onFinish = async () => {
     if (!audit) return;
     setSaving(true);
@@ -154,6 +161,7 @@ function VerificationPage() {
                 "Short Values": shortQ * r.mrp,
                 "Excess Values": excessQ * r.mrp,
                 "Variance in Values": excessQ * r.mrp - shortQ * r.mrp,
+                "Outward": toNum(r.outwardQty),
               },
             })
             .eq("id", r.itemId);
@@ -236,17 +244,18 @@ function VerificationPage() {
                   <Th align="right">Short Value</Th>
                   <Th align="right">Excess Value</Th>
                   <Th align="right">Variance</Th>
+                  <Th align="right" highlight>Outward</Th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">Loading inventory…</td></tr>
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">Loading inventory…</td></tr>
                 ) : !audit ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">
                     No audit found. <Link to="/auditing/new-audit" className="text-sky-300 hover:underline">Start a new audit</Link>.
                   </td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">No items found.</td></tr>
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">No items found.</td></tr>
                 ) : (
                   filtered.map((r) => {
                     const counted = r.countedQty === "" ? null : toNum(r.countedQty);
@@ -277,6 +286,15 @@ function VerificationPage() {
                         <Td align="right" className={excessV > 0 ? "text-emerald-300" : "text-sky-100/50"}>{excessV ? fmt(excessV) : "—"}</Td>
                         <Td align="right" className={variance === 0 ? "text-sky-100/50" : variance > 0 ? "text-emerald-300" : "text-rose-300"}>
                           {counted === null ? "—" : fmt(variance)}
+                        </Td>
+                        <Td align="right">
+                          <input
+                            inputMode="decimal"
+                            value={r.outwardQty}
+                            onChange={(e) => setOutward(r.itemId, e.target.value)}
+                            placeholder="0"
+                            className="w-24 rounded-md border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-right text-white outline-none focus:border-sky-400 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
                         </Td>
                       </tr>
                     );
