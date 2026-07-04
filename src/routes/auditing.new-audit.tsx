@@ -338,39 +338,6 @@ function NewAuditPage() {
   );
 }
 
-function StepBar({ current }: { current: 1 | 2 | 3 }) {
-  const steps = [
-    { n: 1, label: "Firm Details" },
-    { n: 2, label: "Upload Inventory" },
-    { n: 3, label: "Ready to Audit" },
-  ];
-  return (
-    <div className="flex items-center gap-2 overflow-x-auto">
-      {steps.map((s, i) => {
-        const active = s.n === current;
-        const done = s.n < current;
-        return (
-          <div key={s.n} className="flex items-center gap-2 shrink-0">
-            <div
-              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all ${
-                active
-                  ? "border-sky-400/60 bg-sky-500/20 text-white shadow-[0_0_20px_rgba(56,189,248,0.35)]"
-                  : done
-                  ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
-                  : "border-white/10 bg-white/[0.03] text-sky-100/60"
-              }`}
-            >
-              <span className="font-semibold">Step {s.n}</span>
-              <span className="opacity-70">→</span>
-              <span>{s.label}{active ? " (Active)" : ""}</span>
-            </div>
-            {i < steps.length - 1 && <span className="text-sky-100/30">›</span>}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function Input({
   label,
