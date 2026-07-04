@@ -248,13 +248,13 @@ function VerificationPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">Loading inventory…</td></tr>
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">Loading inventory…</td></tr>
                 ) : !audit ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">
                     No audit found. <Link to="/auditing/new-audit" className="text-sky-300 hover:underline">Start a new audit</Link>.
                   </td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={11} className="py-10 text-center text-sky-100/60">No items found.</td></tr>
+                  <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">No items found.</td></tr>
                 ) : (
                   filtered.map((r) => {
                     const counted = r.countedQty === "" ? null : toNum(r.countedQty);
