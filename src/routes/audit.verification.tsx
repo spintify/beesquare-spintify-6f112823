@@ -286,6 +286,15 @@ function VerificationPage() {
                         <Td align="right" className={variance === 0 ? "text-sky-100/50" : variance > 0 ? "text-emerald-300" : "text-rose-300"}>
                           {counted === null ? "—" : fmt(variance)}
                         </Td>
+                        <Td align="right">
+                          <input
+                            inputMode="decimal"
+                            value={r.outwardQty}
+                            onChange={(e) => setOutward(r.itemId, e.target.value)}
+                            placeholder="0"
+                            className="w-24 rounded-md border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-right text-white outline-none focus:border-sky-400 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
+                          />
+                        </Td>
                       </tr>
                     );
                   })
