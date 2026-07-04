@@ -20,6 +20,7 @@ type Row = {
   mrp: number;
   inventoryQty: number;
   countedQty: string;
+  outwardQty: string;
 };
 
 function pick(row: Record<string, unknown>, keys: string[]): unknown {
