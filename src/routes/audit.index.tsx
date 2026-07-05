@@ -94,7 +94,7 @@ function AuditLanding() {
             title="Audits in Progress"
             description="Resume ongoing audit sessions, continue verification, and monitor audit completion status."
             buttonLabel="Continue Audit"
-            to="/audit/verification"
+            to="/audit/in-progress"
           />
           <ActionCard
             index={3}

@@ -26,6 +26,7 @@ import { Route as AuditSettingsRouteImport } from './routes/audit.settings'
 import { Route as AuditReportsRouteImport } from './routes/audit.reports'
 import { Route as AuditReconciliationRouteImport } from './routes/audit.reconciliation'
 import { Route as AuditInventoryRouteImport } from './routes/audit.inventory'
+import { Route as AuditInProgressRouteImport } from './routes/audit.in-progress'
 import { Route as AuditHistoryRouteImport } from './routes/audit.history'
 import { Route as AuditingNewAuditVerifyRouteImport } from './routes/auditing.new-audit.verify'
 import { Route as AuditingNewAuditReviewRouteImport } from './routes/auditing.new-audit.review'
@@ -115,6 +116,11 @@ const AuditInventoryRoute = AuditInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AuditRoute,
 } as any)
+const AuditInProgressRoute = AuditInProgressRouteImport.update({
+  id: '/in-progress',
+  path: '/in-progress',
+  getParentRoute: () => AuditRoute,
+} as any)
 const AuditHistoryRoute = AuditHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
   '/audit/history': typeof AuditHistoryRoute
+  '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
   '/audit/reports': typeof AuditReportsRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
   '/audit/history': typeof AuditHistoryRoute
+  '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
   '/audit/reports': typeof AuditReportsRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/purchase-report': typeof PurchaseReportRoute
   '/sales-report': typeof SalesReportRoute
   '/audit/history': typeof AuditHistoryRoute
+  '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
   '/audit/reports': typeof AuditReportsRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/purchase-report'
     | '/sales-report'
     | '/audit/history'
+    | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
     | '/audit/reports'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/purchase-report'
     | '/sales-report'
     | '/audit/history'
+    | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
     | '/audit/reports'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/purchase-report'
     | '/sales-report'
     | '/audit/history'
+    | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
     | '/audit/reports'
@@ -400,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditInventoryRouteImport
       parentRoute: typeof AuditRoute
     }
+    '/audit/in-progress': {
+      id: '/audit/in-progress'
+      path: '/in-progress'
+      fullPath: '/audit/in-progress'
+      preLoaderRoute: typeof AuditInProgressRouteImport
+      parentRoute: typeof AuditRoute
+    }
     '/audit/history': {
       id: '/audit/history'
       path: '/history'
@@ -426,6 +445,7 @@ declare module '@tanstack/react-router' {
 
 interface AuditRouteChildren {
   AuditHistoryRoute: typeof AuditHistoryRoute
+  AuditInProgressRoute: typeof AuditInProgressRoute
   AuditInventoryRoute: typeof AuditInventoryRoute
   AuditReconciliationRoute: typeof AuditReconciliationRoute
   AuditReportsRoute: typeof AuditReportsRoute
@@ -436,6 +456,7 @@ interface AuditRouteChildren {
 
 const AuditRouteChildren: AuditRouteChildren = {
   AuditHistoryRoute: AuditHistoryRoute,
+  AuditInProgressRoute: AuditInProgressRoute,
   AuditInventoryRoute: AuditInventoryRoute,
   AuditReconciliationRoute: AuditReconciliationRoute,
   AuditReportsRoute: AuditReportsRoute,
@@ -475,12 +496,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
