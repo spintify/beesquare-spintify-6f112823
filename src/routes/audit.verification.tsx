@@ -170,9 +170,9 @@ function VerificationPage() {
             .eq("id", r.itemId);
         });
       await Promise.all(updates);
-      await supabase.from("audits").update({ status: "verified" }).eq("id", audit.id);
-      toast.success("Physical verification saved");
-      navigate({ to: "/audit/reconciliation" });
+      await supabase.from("audits").update({ status: "closed" }).eq("id", audit.id);
+      toast.success("Audit ended. Generating report…");
+      navigate({ to: "/audit/report", search: { id: audit.id } });
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to save");
