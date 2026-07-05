@@ -24,6 +24,7 @@ import { Route as AuditingNewAuditRouteImport } from './routes/auditing.new-audi
 import { Route as AuditVerificationRouteImport } from './routes/audit.verification'
 import { Route as AuditSettingsRouteImport } from './routes/audit.settings'
 import { Route as AuditReportsRouteImport } from './routes/audit.reports'
+import { Route as AuditReportRouteImport } from './routes/audit.report'
 import { Route as AuditReconciliationRouteImport } from './routes/audit.reconciliation'
 import { Route as AuditInventoryRouteImport } from './routes/audit.inventory'
 import { Route as AuditInProgressRouteImport } from './routes/audit.in-progress'
@@ -106,6 +107,11 @@ const AuditReportsRoute = AuditReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AuditRoute,
 } as any)
+const AuditReportRoute = AuditReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AuditRoute,
+} as any)
 const AuditReconciliationRoute = AuditReconciliationRouteImport.update({
   id: '/reconciliation',
   path: '/reconciliation',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
+  '/audit/report': typeof AuditReportRoute
   '/audit/reports': typeof AuditReportsRoute
   '/audit/settings': typeof AuditSettingsRoute
   '/audit/verification': typeof AuditVerificationRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
+  '/audit/report': typeof AuditReportRoute
   '/audit/reports': typeof AuditReportsRoute
   '/audit/settings': typeof AuditSettingsRoute
   '/audit/verification': typeof AuditVerificationRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/audit/in-progress': typeof AuditInProgressRoute
   '/audit/inventory': typeof AuditInventoryRoute
   '/audit/reconciliation': typeof AuditReconciliationRoute
+  '/audit/report': typeof AuditReportRoute
   '/audit/reports': typeof AuditReportsRoute
   '/audit/settings': typeof AuditSettingsRoute
   '/audit/verification': typeof AuditVerificationRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
+    | '/audit/report'
     | '/audit/reports'
     | '/audit/settings'
     | '/audit/verification'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
+    | '/audit/report'
     | '/audit/reports'
     | '/audit/settings'
     | '/audit/verification'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/audit/in-progress'
     | '/audit/inventory'
     | '/audit/reconciliation'
+    | '/audit/report'
     | '/audit/reports'
     | '/audit/settings'
     | '/audit/verification'
@@ -398,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditReportsRouteImport
       parentRoute: typeof AuditRoute
     }
+    '/audit/report': {
+      id: '/audit/report'
+      path: '/report'
+      fullPath: '/audit/report'
+      preLoaderRoute: typeof AuditReportRouteImport
+      parentRoute: typeof AuditRoute
+    }
     '/audit/reconciliation': {
       id: '/audit/reconciliation'
       path: '/reconciliation'
@@ -448,6 +467,7 @@ interface AuditRouteChildren {
   AuditInProgressRoute: typeof AuditInProgressRoute
   AuditInventoryRoute: typeof AuditInventoryRoute
   AuditReconciliationRoute: typeof AuditReconciliationRoute
+  AuditReportRoute: typeof AuditReportRoute
   AuditReportsRoute: typeof AuditReportsRoute
   AuditSettingsRoute: typeof AuditSettingsRoute
   AuditVerificationRoute: typeof AuditVerificationRoute
@@ -459,6 +479,7 @@ const AuditRouteChildren: AuditRouteChildren = {
   AuditInProgressRoute: AuditInProgressRoute,
   AuditInventoryRoute: AuditInventoryRoute,
   AuditReconciliationRoute: AuditReconciliationRoute,
+  AuditReportRoute: AuditReportRoute,
   AuditReportsRoute: AuditReportsRoute,
   AuditSettingsRoute: AuditSettingsRoute,
   AuditVerificationRoute: AuditVerificationRoute,
