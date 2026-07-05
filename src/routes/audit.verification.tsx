@@ -323,7 +323,7 @@ function VerificationPage() {
               className="inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-gradient-to-b from-sky-500/40 to-blue-600/40 px-7 py-2.5 text-sm font-semibold hover:shadow-[0_0_28px_rgba(56,189,248,0.6)] disabled:opacity-60"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-              Save & Continue to Reconciliation
+              End Audit
             </button>
           </div>
         </div>
