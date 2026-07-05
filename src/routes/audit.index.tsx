@@ -94,7 +94,7 @@ function AuditLanding() {
             title="Audits in Progress"
             description="Resume ongoing audit sessions, continue verification, and monitor audit completion status."
             buttonLabel="Continue Audit"
-            to="/audit/verification"
+            to="/audit/in-progress"
           />
           <ActionCard
             index={3}
@@ -122,7 +122,7 @@ function ActionCard({
   title: string;
   description: string;
   buttonLabel: string;
-  to: "/auditing/new-audit" | "/audit/verification" | "/audit/history";
+  to: "/auditing/new-audit" | "/audit/in-progress" | "/audit/history";
 }) {
   return (
     <div className="group relative rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl p-7 shadow-[0_10px_40px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-sky-400/40 hover:shadow-[0_20px_60px_rgba(56,189,248,0.25)]">
