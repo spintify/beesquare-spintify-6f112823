@@ -35,6 +35,17 @@ function HistoryPage() {
     })();
   }, []);
 
+  const handleDelete = async (a: AuditRow) => {
+    if (!confirm(`Delete report "${a.firm_name || a.audit_id}"? This cannot be undone.`)) return;
+    const { error: e1 } = await supabase.from("audit_items").delete().eq("audit_id", a.id);
+    if (e1) { toast.error(e1.message); return; }
+    const { error: e2 } = await supabase.from("audits").delete().eq("id", a.id);
+    if (e2) { toast.error(e2.message); return; }
+    setRows((prev) => prev.filter((r) => r.id !== a.id));
+    toast.success("Report deleted");
+  };
+
+
   return (
     <div className="relative min-h-screen bg-[#050b1e] text-white overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(37,99,235,0.35),_transparent_60%)]" />
