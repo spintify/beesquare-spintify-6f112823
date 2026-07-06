@@ -114,19 +114,20 @@ function VerificationPage() {
   }, [rows, query]);
 
   const totals = useMemo(() => {
-    let shortVal = 0, excessVal = 0, countedItems = 0, totalValue = 0, outwardVal = 0;
+    let shortVal = 0, excessVal = 0, countedItems = 0, totalValue = 0, outwardVal = 0, countedVal = 0;
     for (const r of rows) {
       totalValue += r.mrp * r.inventoryQty;
       if (r.countedQty !== "") {
         countedItems++;
         const counted = toNum(r.countedQty);
+        countedVal += counted * r.mrp;
         shortVal += Math.max(0, r.inventoryQty - counted) * r.mrp;
         excessVal += Math.max(0, counted - r.inventoryQty) * r.mrp;
       }
       const out = toNum(r.outwardQty);
       if (out > 0) outwardVal += out * r.mrp;
     }
-    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems, totalValue, outwardVal };
+    return { shortVal, excessVal, variance: excessVal - shortVal, countedItems, totalValue, outwardVal, countedVal };
   }, [rows]);
 
   const setCounted = (itemId: string, value: string) => {
@@ -210,10 +211,11 @@ function VerificationPage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-4">
           <Stat label="Total Items" value={rows.length.toString()} />
           <Stat label="Counted" value={`${totals.countedItems} / ${rows.length}`} />
           <Stat label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} tone="sky" />
+          <Stat label="Total Counted Value" value={`₹ ${fmt(totals.countedVal)}`} tone="sky" />
           <Stat label="Total Outward Value" value={`₹ ${fmt(totals.outwardVal)}`} tone="amber" />
           <Stat label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
           <Stat label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />

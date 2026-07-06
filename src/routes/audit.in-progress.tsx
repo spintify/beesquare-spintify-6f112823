@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FolderClock } from "lucide-react";
+import { ArrowLeft, Loader2, FolderClock, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/audit/in-progress")({
   component: InProgressPage,
@@ -44,10 +45,20 @@ function InProgressPage() {
         .select("id, audit_id, firm_name, owner_name, status, item_count, created_at")
         .neq("status", "closed")
         .order("created_at", { ascending: false });
-      setRows((data ?? []) as AuditRow[]);
-      setLoading(false);
     })();
   }, []);
+
+  const handleDelete = async (a: AuditRow) => {
+    if (!confirm(`Delete audit "${a.firm_name || a.audit_id}"? This cannot be undone.`)) return;
+    const { error: e1 } = await supabase.from("audit_items").delete().eq("audit_id", a.id);
+    if (e1) { toast.error(e1.message); return; }
+    const { error: e2 } = await supabase.from("audits").delete().eq("id", a.id);
+    if (e2) { toast.error(e2.message); return; }
+    setRows((prev) => prev.filter((r) => r.id !== a.id));
+    toast.success("Audit deleted");
+  };
+
+
 
   return (
     <div className="relative min-h-screen bg-[#050b1e] text-white overflow-hidden">
@@ -119,6 +130,14 @@ function InProgressPage() {
                       className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-1.5 text-sm text-white hover:bg-white/10 whitespace-nowrap"
                     >
                       Manage
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(a)}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-500/10 px-4 py-1.5 text-sm text-rose-200 hover:bg-rose-500/20 whitespace-nowrap"
+                      aria-label="Delete audit"
+                    >
+                      <Trash2 className="h-4 w-4" /> Delete
                     </button>
                   </li>
                 );

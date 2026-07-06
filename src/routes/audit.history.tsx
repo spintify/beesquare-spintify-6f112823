@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileClock, CheckCircle2, FileText, FileSignature } from "lucide-react";
+import { ArrowLeft, Loader2, FileClock, CheckCircle2, FileText, FileSignature, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/audit/history")({
   component: HistoryPage,
@@ -33,6 +34,17 @@ function HistoryPage() {
       setLoading(false);
     })();
   }, []);
+
+  const handleDelete = async (a: AuditRow) => {
+    if (!confirm(`Delete report "${a.firm_name || a.audit_id}"? This cannot be undone.`)) return;
+    const { error: e1 } = await supabase.from("audit_items").delete().eq("audit_id", a.id);
+    if (e1) { toast.error(e1.message); return; }
+    const { error: e2 } = await supabase.from("audits").delete().eq("id", a.id);
+    if (e2) { toast.error(e2.message); return; }
+    setRows((prev) => prev.filter((r) => r.id !== a.id));
+    toast.success("Report deleted");
+  };
+
 
   return (
     <div className="relative min-h-screen bg-[#050b1e] text-white overflow-hidden">
@@ -112,6 +124,14 @@ function HistoryPage() {
                       className="inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-gradient-to-b from-sky-500/30 to-blue-600/30 px-4 py-2 text-sm font-semibold text-white hover:from-sky-400/50 hover:to-blue-500/50 hover:shadow-[0_0_22px_rgba(56,189,248,0.55)]"
                     >
                       <FileSignature className="h-4 w-4" /> Prepare Final Report
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(a)}
+                      className="inline-flex items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/20"
+                      aria-label="Delete report"
+                    >
+                      <Trash2 className="h-4 w-4" /> Delete
                     </button>
                   </div>
                 </li>

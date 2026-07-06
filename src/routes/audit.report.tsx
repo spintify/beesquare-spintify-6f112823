@@ -160,7 +160,7 @@ function ReportPage() {
       </div>
 
       {/* Printable Sheet */}
-      <div className="mx-auto max-w-[1100px] bg-white shadow print:shadow-none my-6 print:my-0 p-8 print:p-6">
+      <div id="print-area" className="mx-auto max-w-[1100px] bg-white shadow print:shadow-none my-6 print:my-0 p-8 print:p-6">
         {/* Header */}
         <header className="flex items-center justify-between border-b-2 border-slate-800 pb-4">
           <img src={SPINTIFY_LOGO} alt="Spintify" className="h-16 w-16 object-contain" />
@@ -277,8 +277,17 @@ function ReportPage() {
 
       <style>{`
         @media print {
-          @page { size: A4; margin: 12mm; }
-          body { background: white !important; }
+          @page { size: A4; margin: 10mm; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+          body * { visibility: hidden; }
+          #print-area, #print-area * { visibility: visible; }
+          #print-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; margin: 0 !important; padding: 6mm !important; }
+          .min-h-screen { min-height: 0 !important; }
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+          thead { display: table-header-group; }
+          tfoot { display: table-footer-group; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
       `}</style>
     </div>
