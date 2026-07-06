@@ -125,6 +125,14 @@ function HistoryPage() {
                     >
                       <FileSignature className="h-4 w-4" /> Prepare Final Report
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(a)}
+                      className="inline-flex items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-200 hover:bg-rose-500/20"
+                      aria-label="Delete report"
+                    >
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </button>
                   </div>
                 </li>
               ))}
