@@ -211,10 +211,11 @@ function VerificationPage() {
           </p>
         </section>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-4">
           <Stat label="Total Items" value={rows.length.toString()} />
           <Stat label="Counted" value={`${totals.countedItems} / ${rows.length}`} />
           <Stat label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} tone="sky" />
+          <Stat label="Total Counted Value" value={`₹ ${fmt(totals.countedVal)}`} tone="sky" />
           <Stat label="Total Outward Value" value={`₹ ${fmt(totals.outwardVal)}`} tone="amber" />
           <Stat label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
           <Stat label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
