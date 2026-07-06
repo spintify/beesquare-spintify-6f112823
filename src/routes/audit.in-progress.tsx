@@ -131,6 +131,14 @@ function InProgressPage() {
                     >
                       Manage
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(a)}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-500/10 px-4 py-1.5 text-sm text-rose-200 hover:bg-rose-500/20 whitespace-nowrap"
+                      aria-label="Delete audit"
+                    >
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </button>
                   </li>
                 );
               })}
