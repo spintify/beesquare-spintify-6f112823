@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2, FileClock, CheckCircle2, FileText, FileSignature } from "lucide-react";
+import { ArrowLeft, Loader2, FileClock, CheckCircle2, FileText, FileSignature, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/audit/history")({
   component: HistoryPage,
