@@ -160,7 +160,7 @@ function ReportPage() {
       </div>
 
       {/* Printable Sheet */}
-      <div className="mx-auto max-w-[1100px] bg-white shadow print:shadow-none my-6 print:my-0 p-8 print:p-6">
+      <div id="print-area" className="mx-auto max-w-[1100px] bg-white shadow print:shadow-none my-6 print:my-0 p-8 print:p-6">
         {/* Header */}
         <header className="flex items-center justify-between border-b-2 border-slate-800 pb-4">
           <img src={SPINTIFY_LOGO} alt="Spintify" className="h-16 w-16 object-contain" />
