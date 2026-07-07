@@ -120,7 +120,7 @@ function HistoryPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate({ to: "/audit/report", search: { id: a.id } })}
+                      onClick={() => navigate({ to: "/audit/final-report", search: { id: a.id } })}
                       className="inline-flex items-center gap-2 rounded-full border border-sky-400/50 bg-gradient-to-b from-sky-500/30 to-blue-600/30 px-4 py-2 text-sm font-semibold text-white hover:from-sky-400/50 hover:to-blue-500/50 hover:shadow-[0_0_22px_rgba(56,189,248,0.55)]"
                     >
                       <FileSignature className="h-4 w-4" /> Prepare Final Report
