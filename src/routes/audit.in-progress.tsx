@@ -40,11 +40,15 @@ function InProgressPage() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      setLoading(true);
+      const { data, error } = await supabase
         .from("audits")
         .select("id, audit_id, firm_name, owner_name, status, item_count, created_at")
         .neq("status", "closed")
         .order("created_at", { ascending: false });
+      if (error) toast.error(error.message);
+      setRows((data ?? []) as AuditRow[]);
+      setLoading(false);
     })();
   }, []);
 
