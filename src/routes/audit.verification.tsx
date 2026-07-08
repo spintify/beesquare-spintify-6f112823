@@ -56,6 +56,7 @@ function VerificationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
+  const [scanOpen, setScanOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
