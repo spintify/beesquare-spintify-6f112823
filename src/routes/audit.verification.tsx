@@ -226,12 +226,21 @@ function VerificationPage() {
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search part number or name…"
-              className="w-full sm:max-w-xs rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-sky-100/40 outline-none focus:border-sky-400/60 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.15)]"
-            />
+            <div className="flex w-full sm:w-auto items-center gap-2">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search part number or name…"
+                className="w-full sm:w-72 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-sky-100/40 outline-none focus:border-sky-400/60 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.15)]"
+              />
+              <button
+                type="button"
+                onClick={() => setScanOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/40 bg-sky-500/10 px-3 py-2 text-xs font-medium text-sky-100 hover:bg-sky-500/20"
+              >
+                <ScanLine className="h-4 w-4" /> Scan
+              </button>
+            </div>
             <p className="text-xs text-sky-100/60">
               Showing <span className="text-white">{filtered.length}</span> of {rows.length} items
             </p>
