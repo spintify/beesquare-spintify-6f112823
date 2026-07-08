@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, Download, FileSpreadsheet, Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
+import { AlertTriangle, Download, FileSpreadsheet, Pencil, Plus, ScanLine, Search, Trash2, Upload } from "lucide-react";
 import {
   CatalogPart,
   LOW_STOCK_THRESHOLD,
@@ -31,6 +31,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Library } from "lucide-react";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 export const Route = createFileRoute("/products")({
   component: ProductsPage,
@@ -46,6 +47,7 @@ function ProductsPage() {
   
   const [editId, setEditId] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [scanOpen, setScanOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const catalogFileRef = useRef<HTMLInputElement>(null);
@@ -643,6 +645,9 @@ function ProductsPage() {
               <Button size="sm" variant="ghost" onClick={downloadTemplate}>
                 <Download className="h-4 w-4" /> Template
               </Button>
+              <Button size="sm" variant="outline" onClick={() => setScanOpen(true)}>
+                <ScanLine className="h-4 w-4" /> Scan
+              </Button>
               <div className="relative w-full sm:w-56">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." className="pl-9" />
@@ -719,6 +724,15 @@ function ProductsPage() {
           </CardContent>
         </Card>
       </div>
+      <BarcodeScanner
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onDetected={(code) => {
+          setQ(code);
+          setScanOpen(false);
+          toast.success(`Scanned: ${code}`);
+        }}
+      />
     </div>
   );
 }
