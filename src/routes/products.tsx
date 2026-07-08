@@ -46,6 +46,7 @@ function ProductsPage() {
   
   const [editId, setEditId] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [scanOpen, setScanOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const catalogFileRef = useRef<HTMLInputElement>(null);
