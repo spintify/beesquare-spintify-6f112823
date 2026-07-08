@@ -85,7 +85,7 @@ function ReportPage() {
       setAudit((a as AuditRow) ?? null);
       const mapped: ReportRow[] = (items ?? []).map((it) => {
         const d = (it.data ?? {}) as Record<string, unknown>;
-        const mrp = toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price"]));
+        const mrp = toNum(pick(d, ["NDP", "MRP", "Price", "Rate", "Unit Price"]));
         const inventoryQty = toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"]));
         const countedQty = toNum(pick(d, ["Quantity Counted"]));
         const shortQ = Math.max(0, inventoryQty - countedQty);
