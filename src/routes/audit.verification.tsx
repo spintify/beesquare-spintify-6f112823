@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 const search = z.object({ id: z.string().uuid().optional() });
 
