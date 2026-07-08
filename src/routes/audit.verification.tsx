@@ -341,6 +341,21 @@ function VerificationPage() {
           </div>
         </div>
       </div>
+      <BarcodeScanner
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onDetected={(code) => {
+          setQuery(code);
+          setScanOpen(false);
+          const match = rows.find(
+            (r) =>
+              r.partNumber.toLowerCase() === code.toLowerCase() ||
+              r.partNumber.toLowerCase().includes(code.toLowerCase()),
+          );
+          if (match) toast.success(`Matched: ${match.partNumber}`);
+          else toast.message(`Scanned ${code}`, { description: "No exact match — filtered list." });
+        }}
+      />
     </div>
   );
 }
