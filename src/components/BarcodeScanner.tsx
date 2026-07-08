@@ -50,7 +50,7 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
       scannerRef.current = null;
       if (s) {
         s.stop().catch(() => {}).finally(() => {
-          s.clear().catch(() => {});
+          try { s.clear(); } catch { /* noop */ }
         });
       }
     };
