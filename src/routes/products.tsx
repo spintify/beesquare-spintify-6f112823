@@ -724,6 +724,15 @@ function ProductsPage() {
           </CardContent>
         </Card>
       </div>
+      <BarcodeScanner
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onDetected={(code) => {
+          setQ(code);
+          setScanOpen(false);
+          toast.success(`Scanned: ${code}`);
+        }}
+      />
     </div>
   );
 }
