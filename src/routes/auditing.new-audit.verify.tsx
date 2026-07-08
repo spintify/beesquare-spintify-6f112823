@@ -201,7 +201,7 @@ function VerifyPage() {
                   <Th>Part Number</Th>
                   <Th>Part Name</Th>
                   <Th>HSN Code</Th>
-                  <Th align="right">MRP</Th>
+                  <Th align="right">NDP</Th>
                   <Th align="right">Qty (Inventory)</Th>
                   <Th align="right" highlight>Qty Counted</Th>
                   <Th align="right">Short Qty</Th>
