@@ -35,7 +35,7 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
         );
         if (cancelled) {
           await scanner.stop().catch(() => {});
-          await scanner.clear().catch(() => {});
+          try { scanner.clear(); } catch { /* noop */ }
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Camera unavailable");
