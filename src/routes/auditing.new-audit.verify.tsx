@@ -70,7 +70,7 @@ function VerifyPage() {
           partNumber: String(pick(d, ["Part Number", "PartNumber", "Part No", "Part_No", "SKU", "Product ID", "Product_Id"]) || ""),
           partName: String(pick(d, ["Part Name", "PartName", "Name", "Product", "Description", "Item"]) || ""),
           hsn: String(pick(d, ["HSN Code", "HSN", "HSN_Code"]) || ""),
-          mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price", "MRP (INR)"])),
+          mrp: toNum(pick(d, ["NDP", "NDP (INR)", "MRP", "Price", "Rate", "Unit Price", "MRP (INR)"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           countedQty: "",
         };
@@ -122,7 +122,7 @@ function VerifyPage() {
                 "Part Number": r.partNumber,
                 "Part Name": r.partName,
                 "HSN Code": r.hsn,
-                MRP: r.mrp,
+                NDP: r.mrp,
                 "Quantity (Inventory)": r.inventoryQty,
                 "Quantity Counted": counted,
                 "Short Quantity": shortQ,
@@ -201,7 +201,7 @@ function VerifyPage() {
                   <Th>Part Number</Th>
                   <Th>Part Name</Th>
                   <Th>HSN Code</Th>
-                  <Th align="right">MRP</Th>
+                  <Th align="right">NDP</Th>
                   <Th align="right">Qty (Inventory)</Th>
                   <Th align="right" highlight>Qty Counted</Th>
                   <Th align="right">Short Qty</Th>
