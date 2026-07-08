@@ -70,7 +70,7 @@ function VerifyPage() {
           partNumber: String(pick(d, ["Part Number", "PartNumber", "Part No", "Part_No", "SKU", "Product ID", "Product_Id"]) || ""),
           partName: String(pick(d, ["Part Name", "PartName", "Name", "Product", "Description", "Item"]) || ""),
           hsn: String(pick(d, ["HSN Code", "HSN", "HSN_Code"]) || ""),
-          mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price", "MRP (INR)"])),
+          mrp: toNum(pick(d, ["NDP", "NDP (INR)", "MRP", "Price", "Rate", "Unit Price", "MRP (INR)"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           countedQty: "",
         };
