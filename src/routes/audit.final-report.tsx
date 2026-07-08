@@ -62,7 +62,7 @@ function FinalReportPage() {
       const mapped = (items ?? []).map((it) => {
         const d = (it.data ?? {}) as Record<string, unknown>;
         return {
-          mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price"])),
+          mrp: toNum(pick(d, ["NDP", "MRP", "Price", "Rate", "Unit Price"])),
           inv: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           counted: toNum(pick(d, ["Quantity Counted"])),
         };
