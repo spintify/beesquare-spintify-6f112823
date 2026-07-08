@@ -215,7 +215,7 @@ function ReportPage() {
                 <Th>Part Number</Th>
                 <Th>Part Name</Th>
                 <Th>HSN</Th>
-                <Th right>MRP</Th>
+                <Th right>NDP</Th>
                 <Th right>Inv Qty</Th>
                 <Th right>Counted</Th>
                 <Th right>Short</Th>
