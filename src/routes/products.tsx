@@ -643,6 +643,9 @@ function ProductsPage() {
               <Button size="sm" variant="ghost" onClick={downloadTemplate}>
                 <Download className="h-4 w-4" /> Template
               </Button>
+              <Button size="sm" variant="outline" onClick={() => setScanOpen(true)}>
+                <ScanLine className="h-4 w-4" /> Scan
+              </Button>
               <div className="relative w-full sm:w-56">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." className="pl-9" />
