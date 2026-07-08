@@ -98,7 +98,7 @@ function VerificationPage() {
           partNumber: String(pick(d, ["Part Number", "PartNumber", "Part No", "SKU", "Product ID"]) || ""),
           partName: String(pick(d, ["Part Name", "PartName", "Name", "Product", "Description", "Item"]) || ""),
           hsn: String(pick(d, ["HSN Code", "HSN"]) || ""),
-          mrp: toNum(pick(d, ["MRP", "Price", "Rate", "Unit Price"])),
+          mrp: toNum(pick(d, ["NDP", "MRP", "Price", "Rate", "Unit Price"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
           countedQty: String(pick(d, ["Quantity Counted"]) || ""),
           outwardQty: String(pick(d, ["Outward"]) || ""),
