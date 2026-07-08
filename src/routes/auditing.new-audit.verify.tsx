@@ -122,7 +122,7 @@ function VerifyPage() {
                 "Part Number": r.partNumber,
                 "Part Name": r.partName,
                 "HSN Code": r.hsn,
-                MRP: r.mrp,
+                NDP: r.mrp,
                 "Quantity (Inventory)": r.inventoryQty,
                 "Quantity Counted": counted,
                 "Short Quantity": shortQ,
