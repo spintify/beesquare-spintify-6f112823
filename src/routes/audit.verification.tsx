@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -48,20 +48,43 @@ function fmt(n: number) {
   return n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function rowToData(r: Row) {
+  const counted = toNum(r.countedQty);
+  const shortQ = Math.max(0, r.inventoryQty - counted);
+  const excessQ = Math.max(0, counted - r.inventoryQty);
+  return {
+    "Part Number": r.partNumber,
+    "Part Name": r.partName,
+    "HSN Code": r.hsn,
+    NDP: r.mrp,
+    "Quantity (Inventory)": r.inventoryQty,
+    "Quantity Counted": counted,
+    "Short Quantity": shortQ,
+    "Excess Quantity": excessQ,
+    "Short Values": shortQ * r.mrp,
+    "Excess Values": excessQ * r.mrp,
+    "Variance in Values": excessQ * r.mrp - shortQ * r.mrp,
+    "Outward": toNum(r.outwardQty),
+  };
+}
+
 function VerificationPage() {
   const { id: idFromSearch } = Route.useSearch();
   const navigate = useNavigate();
   const [audit, setAudit] = useState<{ id: string; audit_id: string; firm_name: string } | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
+  const rowsRef = useRef<Row[]>([]);
+  useEffect(() => { rowsRef.current = rows; }, [rows]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
   const [scanOpen, setScanOpen] = useState(false);
+  const [lastScan, setLastScan] = useState<string | null>(null);
+  const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      // Determine which audit to load: explicit ?id=... or fallback to latest draft
       let auditRow: { id: string; audit_id: string; firm_name: string } | null = null;
       if (idFromSearch) {
         const { data } = await supabase
@@ -93,6 +116,7 @@ function VerificationPage() {
         .order("row_index");
       const mapped: Row[] = (items ?? []).map((it) => {
         const d = (it.data ?? {}) as Record<string, unknown>;
+        const rawCounted = pick(d, ["Quantity Counted"]);
         return {
           itemId: it.id,
           partNumber: String(pick(d, ["Part Number", "PartNumber", "Part No", "SKU", "Product ID"]) || ""),
@@ -100,14 +124,51 @@ function VerificationPage() {
           hsn: String(pick(d, ["HSN Code", "HSN"]) || ""),
           mrp: toNum(pick(d, ["NDP", "MRP", "Price", "Rate", "Unit Price"])),
           inventoryQty: toNum(pick(d, ["Quantity (Inventory)", "Inventory", "Quantity", "Qty", "Stock"])),
-          countedQty: String(pick(d, ["Quantity Counted"]) || ""),
-          outwardQty: String(pick(d, ["Outward"]) || ""),
+          countedQty: rawCounted === "" || rawCounted === null || rawCounted === undefined ? "0" : String(rawCounted),
+          outwardQty: String(pick(d, ["Outward"]) || "0"),
         };
       });
       setRows(mapped);
       setLoading(false);
     })();
   }, [idFromSearch]);
+
+  // Live sync: subscribe to audit_items updates for this audit
+  useEffect(() => {
+    if (!audit) return;
+    const channel = supabase
+      .channel(`audit_items:${audit.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "audit_items", filter: `audit_id=eq.${audit.id}` },
+        (payload) => {
+          const nd = (payload.new as { id: string; data: Record<string, unknown> }).data ?? {};
+          const id = (payload.new as { id: string }).id;
+          setRows((prev) =>
+            prev.map((r) => {
+              if (r.itemId !== id) return r;
+              const rawCounted = (nd as Record<string, unknown>)["Quantity Counted"];
+              const rawOutward = (nd as Record<string, unknown>)["Outward"];
+              return {
+                ...r,
+                countedQty:
+                  rawCounted === undefined || rawCounted === null || rawCounted === ""
+                    ? r.countedQty
+                    : String(rawCounted),
+                outwardQty:
+                  rawOutward === undefined || rawOutward === null
+                    ? r.outwardQty
+                    : String(rawOutward),
+              };
+            }),
+          );
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [audit]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -119,22 +180,35 @@ function VerificationPage() {
     let shortVal = 0, excessVal = 0, countedItems = 0, totalValue = 0, outwardVal = 0, countedVal = 0;
     for (const r of rows) {
       totalValue += r.mrp * r.inventoryQty;
-      if (r.countedQty !== "") {
-        countedItems++;
-        const counted = toNum(r.countedQty);
-        countedVal += counted * r.mrp;
-        shortVal += Math.max(0, r.inventoryQty - counted) * r.mrp;
-        excessVal += Math.max(0, counted - r.inventoryQty) * r.mrp;
-      }
+      const counted = toNum(r.countedQty);
+      if (counted > 0) countedItems++;
+      countedVal += counted * r.mrp;
+      shortVal += Math.max(0, r.inventoryQty - counted) * r.mrp;
+      excessVal += Math.max(0, counted - r.inventoryQty) * r.mrp;
       const out = toNum(r.outwardQty);
       if (out > 0) outwardVal += out * r.mrp;
     }
     return { shortVal, excessVal, variance: excessVal - shortVal, countedItems, totalValue, outwardVal, countedVal };
   }, [rows]);
 
+  const persistRow = useCallback(async (row: Row) => {
+    await supabase.from("audit_items").update({ data: rowToData(row) }).eq("id", row.itemId);
+  }, []);
+
   const setCounted = (itemId: string, value: string) => {
     if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
     setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, countedQty: value } : r)));
+  };
+
+  const commitCounted = (itemId: string) => {
+    const row = rowsRef.current.find((r) => r.itemId === itemId);
+    if (!row) return;
+    const normalized = row.countedQty === "" ? "0" : row.countedQty;
+    const updated = { ...row, countedQty: normalized };
+    if (normalized !== row.countedQty) {
+      setRows((prev) => prev.map((r) => (r.itemId === itemId ? updated : r)));
+    }
+    persistRow(updated);
   };
 
   const setOutward = (itemId: string, value: string) => {
@@ -142,36 +216,50 @@ function VerificationPage() {
     setRows((prev) => prev.map((r) => (r.itemId === itemId ? { ...r, outwardQty: value } : r)));
   };
 
+  const commitOutward = (itemId: string) => {
+    const row = rowsRef.current.find((r) => r.itemId === itemId);
+    if (!row) return;
+    const normalized = row.outwardQty === "" ? "0" : row.outwardQty;
+    const updated = { ...row, outwardQty: normalized };
+    if (normalized !== row.outwardQty) {
+      setRows((prev) => prev.map((r) => (r.itemId === itemId ? updated : r)));
+    }
+    persistRow(updated);
+  };
+
+  const handleScan = useCallback(
+    (code: string) => {
+      const cleaned = code.trim();
+      if (!cleaned) return;
+      const now = Date.now();
+      if (lastScanRef.current.code === cleaned && now - lastScanRef.current.at < 1500) return;
+      lastScanRef.current = { code: cleaned, at: now };
+      setLastScan(cleaned);
+
+      const lower = cleaned.toLowerCase();
+      const match =
+        rowsRef.current.find((r) => r.partNumber.toLowerCase() === lower) ||
+        rowsRef.current.find((r) => r.partNumber.toLowerCase().includes(lower));
+
+      if (!match) {
+        toast.error(`No match for ${cleaned}`);
+        return;
+      }
+      const next = { ...match, countedQty: String(toNum(match.countedQty) + 1) };
+      setRows((prev) => prev.map((r) => (r.itemId === match.itemId ? next : r)));
+      persistRow(next);
+      toast.success(`+1 ${match.partNumber} → ${next.countedQty}`);
+    },
+    [persistRow],
+  );
+
   const onFinish = async () => {
     if (!audit) return;
     setSaving(true);
     try {
-      const updates = rows
-        .filter((r) => r.countedQty !== "")
-        .map(async (r) => {
-          const counted = toNum(r.countedQty);
-          const shortQ = Math.max(0, r.inventoryQty - counted);
-          const excessQ = Math.max(0, counted - r.inventoryQty);
-          return supabase
-            .from("audit_items")
-            .update({
-              data: {
-                "Part Number": r.partNumber,
-                "Part Name": r.partName,
-                "HSN Code": r.hsn,
-                NDP: r.mrp,
-                "Quantity (Inventory)": r.inventoryQty,
-                "Quantity Counted": counted,
-                "Short Quantity": shortQ,
-                "Excess Quantity": excessQ,
-                "Short Values": shortQ * r.mrp,
-                "Excess Values": excessQ * r.mrp,
-                "Variance in Values": excessQ * r.mrp - shortQ * r.mrp,
-                "Outward": toNum(r.outwardQty),
-              },
-            })
-            .eq("id", r.itemId);
-        });
+      const updates = rows.map((r) =>
+        supabase.from("audit_items").update({ data: rowToData(r) }).eq("id", r.itemId),
+      );
       await Promise.all(updates);
       await supabase.from("audits").update({ status: "closed" }).eq("id", audit.id);
       toast.success("Audit ended. Generating report…");
@@ -205,11 +293,11 @@ function VerificationPage() {
 
         <section className="text-center pt-8 pb-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-xs text-sky-200">
-            <ClipboardCheck className="h-3.5 w-3.5" /> Enter Physically Counted Quantities
+            <Radio className="h-3.5 w-3.5 animate-pulse" /> Live — scan on any device, counts sync instantly
           </div>
           <h2 className="mt-3 text-3xl md:text-4xl font-black tracking-tight">Inventory Verification</h2>
           <p className="mt-2 text-sky-100/70 text-sm">
-            {audit?.firm_name ? `${audit.firm_name} — ` : ""}Fill the “Quantity Counted” column. Other columns auto-calculate.
+            {audit?.firm_name ? `${audit.firm_name} — ` : ""}Scan a barcode to add +1 to Quantity Counted, or edit manually.
           </p>
         </section>
 
@@ -226,7 +314,7 @@ function VerificationPage() {
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <div className="flex w-full sm:w-auto items-center gap-2">
+            <div className="flex w-full sm:w-auto items-center gap-2 flex-wrap">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -238,8 +326,13 @@ function VerificationPage() {
                 onClick={() => setScanOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/40 bg-sky-500/10 px-3 py-2 text-xs font-medium text-sky-100 hover:bg-sky-500/20"
               >
-                <ScanLine className="h-4 w-4" /> Scan
+                <ScanLine className="h-4 w-4" /> Scan (+1)
               </button>
+              {lastScan && (
+                <span className="text-[11px] text-sky-100/60">
+                  Last: <span className="text-sky-200 font-medium">{lastScan}</span>
+                </span>
+              )}
             </div>
             <p className="text-xs text-sky-100/60">
               Showing <span className="text-white">{filtered.length}</span> of {rows.length} items
@@ -275,9 +368,9 @@ function VerificationPage() {
                   <tr><td colSpan={12} className="py-10 text-center text-sky-100/60">No items found.</td></tr>
                 ) : (
                   filtered.map((r) => {
-                    const counted = r.countedQty === "" ? null : toNum(r.countedQty);
-                    const shortQ = counted === null ? 0 : Math.max(0, r.inventoryQty - counted);
-                    const excessQ = counted === null ? 0 : Math.max(0, counted - r.inventoryQty);
+                    const counted = toNum(r.countedQty);
+                    const shortQ = Math.max(0, r.inventoryQty - counted);
+                    const excessQ = Math.max(0, counted - r.inventoryQty);
                     const shortV = shortQ * r.mrp;
                     const excessV = excessQ * r.mrp;
                     const variance = excessV - shortV;
@@ -293,6 +386,7 @@ function VerificationPage() {
                             inputMode="decimal"
                             value={r.countedQty}
                             onChange={(e) => setCounted(r.itemId, e.target.value)}
+                            onBlur={() => commitCounted(r.itemId)}
                             placeholder="0"
                             className="w-24 rounded-md border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-right text-white outline-none focus:border-sky-400 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
                           />
@@ -302,13 +396,14 @@ function VerificationPage() {
                         <Td align="right" className={shortV > 0 ? "text-rose-300" : "text-sky-100/50"}>{shortV ? fmt(shortV) : "—"}</Td>
                         <Td align="right" className={excessV > 0 ? "text-emerald-300" : "text-sky-100/50"}>{excessV ? fmt(excessV) : "—"}</Td>
                         <Td align="right" className={variance === 0 ? "text-sky-100/50" : variance > 0 ? "text-emerald-300" : "text-rose-300"}>
-                          {counted === null ? "—" : fmt(variance)}
+                          {fmt(variance)}
                         </Td>
                         <Td align="right">
                           <input
                             inputMode="decimal"
                             value={r.outwardQty}
                             onChange={(e) => setOutward(r.itemId, e.target.value)}
+                            onBlur={() => commitOutward(r.itemId)}
                             placeholder="0"
                             className="w-24 rounded-md border border-sky-400/30 bg-sky-500/10 px-2 py-1 text-right text-white outline-none focus:border-sky-400 focus:shadow-[0_0_0_3px_rgba(56,189,248,0.2)]"
                           />
@@ -339,22 +434,16 @@ function VerificationPage() {
               End Audit
             </button>
           </div>
+          <p className="mt-3 text-[11px] text-sky-100/50 text-center">
+            <ClipboardCheck className="inline h-3 w-3 mr-1" />
+            Every scan and edit saves instantly and syncs to other devices viewing this audit.
+          </p>
         </div>
       </div>
       <BarcodeScanner
         open={scanOpen}
         onClose={() => setScanOpen(false)}
-        onDetected={(code) => {
-          setQuery(code);
-          setScanOpen(false);
-          const match = rows.find(
-            (r) =>
-              r.partNumber.toLowerCase() === code.toLowerCase() ||
-              r.partNumber.toLowerCase().includes(code.toLowerCase()),
-          );
-          if (match) toast.success(`Matched: ${match.partNumber}`);
-          else toast.message(`Scanned ${code}`, { description: "No exact match — filtered list." });
-        }}
+        onDetected={handleScan}
       />
     </div>
   );
