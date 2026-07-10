@@ -80,7 +80,6 @@ function VerificationPage() {
   const [query, setQuery] = useState("");
   const [scanOpen, setScanOpen] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
-  const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
 
   useEffect(() => {
     (async () => {
