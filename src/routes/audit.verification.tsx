@@ -231,20 +231,19 @@ function VerificationPage() {
     (code: string) => {
       const cleaned = code.trim();
       if (!cleaned) return;
-      const now = Date.now();
-      if (lastScanRef.current.code === cleaned && now - lastScanRef.current.at < 1500) return;
-      lastScanRef.current = { code: cleaned, at: now };
       setLastScan(cleaned);
 
-      const lower = cleaned.toLowerCase();
-      const match =
-        rowsRef.current.find((r) => r.partNumber.toLowerCase() === lower) ||
-        rowsRef.current.find((r) => r.partNumber.toLowerCase().includes(lower));
+      // Exact, case-insensitive, trimmed comparison against imported Part Number column.
+      const key = cleaned.toLowerCase();
+      const match = rowsRef.current.find(
+        (r) => r.partNumber.trim().toLowerCase() === key,
+      );
 
       if (!match) {
-        toast.error(`No match for ${cleaned}`);
+        toast.error("Part Number not found.");
         return;
       }
+      // Exactly one +1 per accepted scan.
       const next = { ...match, countedQty: String(toNum(match.countedQty) + 1) };
       setRows((prev) => prev.map((r) => (r.itemId === match.itemId ? next : r)));
       persistRow(next);
