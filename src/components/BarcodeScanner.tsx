@@ -13,12 +13,18 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Barcode-lock: the code currently visible in the frame. While set, repeat
+  // detections of the same code are ignored. Cleared as soon as a frame does
+  // not decode that code (barcode has left the frame), so the next appearance
+  // is processed again exactly once.
+  const activeCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     setError(null);
     setStarting(true);
+    activeCodeRef.current = null;
 
     (async () => {
       try {
@@ -29,9 +35,23 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
           { fps: 10, qrbox: { width: 280, height: 160 } },
           (decodedText) => {
             if (cancelled) return;
-            onDetected(decodedText.trim());
+            const code = decodedText.trim();
+            if (!code) return;
+            // If a different code appears, release the previous lock immediately.
+            if (activeCodeRef.current && activeCodeRef.current !== code) {
+              activeCodeRef.current = null;
+            }
+            // Ignore repeat detections of the currently-locked code.
+            if (activeCodeRef.current === code) return;
+            activeCodeRef.current = code;
+            onDetected(code);
           },
-          () => {},
+          () => {
+            // Frame produced no decode → barcode is no longer visible.
+            // Release the lock so the same code can be scanned again next time.
+            if (cancelled) return;
+            if (activeCodeRef.current !== null) activeCodeRef.current = null;
+          },
         );
         if (cancelled) {
           await scanner.stop().catch(() => {});
@@ -46,6 +66,7 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
 
     return () => {
       cancelled = true;
+      activeCodeRef.current = null;
       const s = scannerRef.current;
       scannerRef.current = null;
       if (s) {
