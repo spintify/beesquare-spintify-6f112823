@@ -39,38 +39,18 @@ export function BarcodeScanner({ open, onClose, onDetected }: Props) {
           { fps: 10, qrbox: { width: 280, height: 160 } },
           (decodedText) => {
             if (cancelled) return;
+            if (isLockedRef.current) return;
             const scannedValue = decodedText.trim();
             if (!scannedValue) return;
-
-            if (!isLockedRef.current) {
-              // Not locked → process and lock.
-              activeBarcodeRef.current = scannedValue;
-              isLockedRef.current = true;
-              onDetected(scannedValue);
-              return;
-            }
-
-            // Locked.
-            if (scannedValue === activeBarcodeRef.current) {
-              // Same barcode still visible → ignore completely.
-              return;
-            }
-
-            // Different barcode entered frame → process immediately, keep lock
-            // on the new value.
-            activeBarcodeRef.current = scannedValue;
             isLockedRef.current = true;
+            activeBarcodeRef.current = scannedValue;
             onDetected(scannedValue);
+            onClose();
           },
           () => {
-            // No decode in this frame → activeBarcode is not present anymore.
-            // Unlock so the next appearance is processed exactly once.
-            if (cancelled) return;
-            if (isLockedRef.current || activeBarcodeRef.current !== null) {
-              activeBarcodeRef.current = null;
-              isLockedRef.current = false;
-            }
+            // no-op: single-shot scan; scanner closes after first detection.
           },
+
         );
         if (cancelled) {
           await scanner.stop().catch(() => {});
