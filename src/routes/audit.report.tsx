@@ -113,15 +113,16 @@ function ReportPage() {
   }, [id]);
 
   const totals = useMemo(() => {
-    let totalValue = 0, shortVal = 0, excessVal = 0, outwardVal = 0, counted = 0;
+    let totalValue = 0, countedVal = 0, shortVal = 0, excessVal = 0, outwardVal = 0, counted = 0;
     for (const r of rows) {
       totalValue += r.mrp * r.inventoryQty;
+      countedVal += r.mrp * r.countedQty;
       shortVal += r.shortV;
       excessVal += r.excessV;
       outwardVal += r.outwardValue;
       if (r.countedQty > 0) counted++;
     }
-    return { totalValue, shortVal, excessVal, outwardVal, counted, variance: excessVal - shortVal };
+    return { totalValue, countedVal, shortVal, excessVal, outwardVal, counted, variance: excessVal - shortVal };
   }, [rows]);
 
   if (loading) {
