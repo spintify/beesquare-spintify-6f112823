@@ -197,7 +197,7 @@ function ReportPage() {
         </section>
 
         {/* Summary tiles */}
-        <section className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-5 text-xs">
+        <section className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 mt-5 text-xs">
           <SummaryBox label="Total Part Lines" value={rows.length.toString()} />
           <SummaryBox label="Part Line Counted" value={`${totals.counted}`} />
           <SummaryBox label="SIEBEL Stock Value" value={`₹ ${fmt(totals.totalValue)}`} />
