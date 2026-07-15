@@ -514,6 +514,106 @@ function VerificationPage() {
         onClose={() => setScanOpen(false)}
         onDetected={handleScan}
       />
+      {addOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0a1330] p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-emerald-300" /> Add Physical Item
+                </h3>
+                <p className="text-[11px] text-sky-100/60 mt-0.5">
+                  For parts physically present but not in the inventory sheet.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                className="rounded-md p-1 text-sky-100/60 hover:bg-white/5 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Part Number *">
+                <input
+                  value={form.partNumber}
+                  onChange={(e) => setForm((f) => ({ ...f, partNumber: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="Part Name">
+                <input
+                  value={form.partName}
+                  onChange={(e) => setForm((f) => ({ ...f, partName: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="HSN Code">
+                <input
+                  value={form.hsn}
+                  onChange={(e) => setForm((f) => ({ ...f, hsn: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="NDP">
+                <input
+                  inputMode="decimal"
+                  value={form.mrp}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, mrp: v }));
+                  }}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="Quantity Counted">
+                <input
+                  inputMode="decimal"
+                  value={form.countedQty}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, countedQty: v }));
+                  }}
+                  className="w-full rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                />
+              </Field>
+              <Field label="Outward">
+                <input
+                  inputMode="decimal"
+                  value={form.outwardQty}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, outwardQty: v }));
+                  }}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+            </div>
+            <p className="mt-3 text-[11px] text-sky-100/50">
+              Inventory Quantity will be set to 0 — the counted qty appears as an excess.
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleAddRow}
+                disabled={adding}
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-gradient-to-b from-emerald-500/40 to-emerald-600/40 px-5 py-2 text-sm font-semibold text-white hover:shadow-[0_0_20px_rgba(52,211,153,0.5)] disabled:opacity-60"
+              >
+                {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
