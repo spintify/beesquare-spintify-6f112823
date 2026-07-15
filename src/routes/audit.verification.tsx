@@ -255,6 +255,65 @@ function VerificationPage() {
     [persistRow],
   );
 
+  const handleAddRow = async () => {
+    if (!audit) return;
+    const partNumber = form.partNumber.trim();
+    if (!partNumber) {
+      toast.error("Part Number is required.");
+      return;
+    }
+    const dup = rowsRef.current.find(
+      (r) => r.partNumber.trim().toLowerCase() === partNumber.toLowerCase(),
+    );
+    if (dup) {
+      toast.error("Part Number already exists in the sheet.");
+      return;
+    }
+    setAdding(true);
+    try {
+      const newRow: Omit<Row, "itemId"> = {
+        partNumber,
+        partName: form.partName.trim(),
+        hsn: form.hsn.trim(),
+        mrp: toNum(form.mrp),
+        inventoryQty: 0,
+        countedQty: form.countedQty === "" ? "0" : form.countedQty,
+        outwardQty: form.outwardQty === "" ? "0" : form.outwardQty,
+      };
+      const nextIndex =
+        rowsRef.current.reduce((max, _r, i) => Math.max(max, i), -1) + rowsRef.current.length > 0
+          ? rowsRef.current.length
+          : 0;
+      // Use current length as row_index (append)
+      const rowIndex = rowsRef.current.length;
+      const { data, error } = await supabase
+        .from("audit_items")
+        .insert({
+          audit_id: audit.id,
+          row_index: rowIndex,
+          data: rowToData({ ...newRow, itemId: "" } as Row),
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const inserted: Row = { ...newRow, itemId: data.id };
+      setRows((prev) => [...prev, inserted]);
+      await supabase
+        .from("audits")
+        .update({ item_count: rowsRef.current.length + 1 })
+        .eq("id", audit.id);
+      toast.success(`Added ${partNumber}`);
+      setForm(emptyForm);
+      setAddOpen(false);
+      void nextIndex;
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Failed to add row");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   const onFinish = async () => {
     if (!audit) return;
     setSaving(true);
