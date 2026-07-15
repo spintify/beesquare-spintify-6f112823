@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine, Radio } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine, Radio, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
@@ -80,6 +80,10 @@ function VerificationPage() {
   const [query, setQuery] = useState("");
   const [scanOpen, setScanOpen] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const emptyForm = { partNumber: "", partName: "", hsn: "", mrp: "", countedQty: "1", outwardQty: "0" };
+  const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
     (async () => {
@@ -251,6 +255,65 @@ function VerificationPage() {
     [persistRow],
   );
 
+  const handleAddRow = async () => {
+    if (!audit) return;
+    const partNumber = form.partNumber.trim();
+    if (!partNumber) {
+      toast.error("Part Number is required.");
+      return;
+    }
+    const dup = rowsRef.current.find(
+      (r) => r.partNumber.trim().toLowerCase() === partNumber.toLowerCase(),
+    );
+    if (dup) {
+      toast.error("Part Number already exists in the sheet.");
+      return;
+    }
+    setAdding(true);
+    try {
+      const newRow: Omit<Row, "itemId"> = {
+        partNumber,
+        partName: form.partName.trim(),
+        hsn: form.hsn.trim(),
+        mrp: toNum(form.mrp),
+        inventoryQty: 0,
+        countedQty: form.countedQty === "" ? "0" : form.countedQty,
+        outwardQty: form.outwardQty === "" ? "0" : form.outwardQty,
+      };
+      const nextIndex =
+        rowsRef.current.reduce((max, _r, i) => Math.max(max, i), -1) + rowsRef.current.length > 0
+          ? rowsRef.current.length
+          : 0;
+      // Use current length as row_index (append)
+      const rowIndex = rowsRef.current.length;
+      const { data, error } = await supabase
+        .from("audit_items")
+        .insert({
+          audit_id: audit.id,
+          row_index: rowIndex,
+          data: rowToData({ ...newRow, itemId: "" } as Row),
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const inserted: Row = { ...newRow, itemId: data.id };
+      setRows((prev) => [...prev, inserted]);
+      await supabase
+        .from("audits")
+        .update({ item_count: rowsRef.current.length + 1 })
+        .eq("id", audit.id);
+      toast.success(`Added ${partNumber}`);
+      setForm(emptyForm);
+      setAddOpen(false);
+      void nextIndex;
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Failed to add row");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   const onFinish = async () => {
     if (!audit) return;
     setSaving(true);
@@ -325,6 +388,14 @@ function VerificationPage() {
                 className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/40 bg-sky-500/10 px-3 py-2 text-xs font-medium text-sky-100 hover:bg-sky-500/20"
               >
                 <ScanLine className="h-4 w-4" /> Scan (+1)
+              </button>
+              <button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                disabled={!audit}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-100 hover:bg-emerald-500/20 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" /> Add Row
               </button>
               {lastScan && (
                 <span className="text-[11px] text-sky-100/60">
@@ -443,6 +514,106 @@ function VerificationPage() {
         onClose={() => setScanOpen(false)}
         onDetected={handleScan}
       />
+      {addOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#0a1330] p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-emerald-300" /> Add Physical Item
+                </h3>
+                <p className="text-[11px] text-sky-100/60 mt-0.5">
+                  For parts physically present but not in the inventory sheet.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                className="rounded-md p-1 text-sky-100/60 hover:bg-white/5 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Part Number *">
+                <input
+                  value={form.partNumber}
+                  onChange={(e) => setForm((f) => ({ ...f, partNumber: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="Part Name">
+                <input
+                  value={form.partName}
+                  onChange={(e) => setForm((f) => ({ ...f, partName: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="HSN Code">
+                <input
+                  value={form.hsn}
+                  onChange={(e) => setForm((f) => ({ ...f, hsn: e.target.value }))}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="NDP">
+                <input
+                  inputMode="decimal"
+                  value={form.mrp}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, mrp: v }));
+                  }}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+              <Field label="Quantity Counted">
+                <input
+                  inputMode="decimal"
+                  value={form.countedQty}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, countedQty: v }));
+                  }}
+                  className="w-full rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                />
+              </Field>
+              <Field label="Outward">
+                <input
+                  inputMode="decimal"
+                  value={form.outwardQty}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^\d*\.?\d*$/.test(v)) setForm((f) => ({ ...f, outwardQty: v }));
+                  }}
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-sky-400/60"
+                />
+              </Field>
+            </div>
+            <p className="mt-3 text-[11px] text-sky-100/50">
+              Inventory Quantity will be set to 0 — the counted qty appears as an excess.
+            </p>
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setAddOpen(false)}
+                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleAddRow}
+                disabled={adding}
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/50 bg-gradient-to-b from-emerald-500/40 to-emerald-600/40 px-5 py-2 text-sm font-semibold text-white hover:shadow-[0_0_20px_rgba(52,211,153,0.5)] disabled:opacity-60"
+              >
+                {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -470,5 +641,14 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "ro
       <p className="text-[11px] uppercase tracking-widest text-sky-100/60">{label}</p>
       <p className={`mt-1 text-lg font-bold ${toneCls}`}>{value}</p>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-[11px] uppercase tracking-widest text-sky-100/60 mb-1">{label}</span>
+      {children}
+    </label>
   );
 }
