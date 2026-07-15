@@ -198,11 +198,13 @@ function ReportPage() {
 
         {/* Summary tiles */}
         <section className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-5 text-xs">
-          <SummaryBox label="Total Items" value={rows.length.toString()} />
-          <SummaryBox label="Counted" value={`${totals.counted}`} />
-          <SummaryBox label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} />
-          <SummaryBox label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
-          <SummaryBox label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <SummaryBox label="Total Part Lines" value={rows.length.toString()} />
+          <SummaryBox label="Part Line Counted" value={`${totals.counted}`} />
+          <SummaryBox label="SIEBEL Stock Value" value={`₹ ${fmt(totals.totalValue)}`} />
+          <SummaryBox label="Physical Stock Value" value={`₹ ${fmt(totals.countedVal)}`} />
+          <SummaryBox label="Negative Variance" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
+          <SummaryBox label="Positive Variance" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <SummaryBox label="Variance Value" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
           <SummaryBox label="Outward Value" value={`₹ ${fmt(totals.outwardVal)}`} tone="amber" />
         </section>
 
