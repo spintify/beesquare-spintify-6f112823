@@ -80,6 +80,10 @@ function VerificationPage() {
   const [query, setQuery] = useState("");
   const [scanOpen, setScanOpen] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const emptyForm = { partNumber: "", partName: "", hsn: "", mrp: "", countedQty: "1", outwardQty: "0" };
+  const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
     (async () => {
