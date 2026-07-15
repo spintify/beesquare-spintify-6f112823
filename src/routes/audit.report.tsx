@@ -113,15 +113,16 @@ function ReportPage() {
   }, [id]);
 
   const totals = useMemo(() => {
-    let totalValue = 0, shortVal = 0, excessVal = 0, outwardVal = 0, counted = 0;
+    let totalValue = 0, countedVal = 0, shortVal = 0, excessVal = 0, outwardVal = 0, counted = 0;
     for (const r of rows) {
       totalValue += r.mrp * r.inventoryQty;
+      countedVal += r.mrp * r.countedQty;
       shortVal += r.shortV;
       excessVal += r.excessV;
       outwardVal += r.outwardValue;
       if (r.countedQty > 0) counted++;
     }
-    return { totalValue, shortVal, excessVal, outwardVal, counted, variance: excessVal - shortVal };
+    return { totalValue, countedVal, shortVal, excessVal, outwardVal, counted, variance: excessVal - shortVal };
   }, [rows]);
 
   if (loading) {
@@ -196,12 +197,14 @@ function ReportPage() {
         </section>
 
         {/* Summary tiles */}
-        <section className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-5 text-xs">
-          <SummaryBox label="Total Items" value={rows.length.toString()} />
-          <SummaryBox label="Counted" value={`${totals.counted}`} />
-          <SummaryBox label="Total Value" value={`₹ ${fmt(totals.totalValue)}`} />
-          <SummaryBox label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
-          <SummaryBox label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+        <section className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 mt-5 text-xs">
+          <SummaryBox label="Total Part Lines" value={rows.length.toString()} />
+          <SummaryBox label="Part Line Counted" value={`${totals.counted}`} />
+          <SummaryBox label="SIEBEL Stock Value" value={`₹ ${fmt(totals.totalValue)}`} />
+          <SummaryBox label="Physical Stock Value" value={`₹ ${fmt(totals.countedVal)}`} />
+          <SummaryBox label="Negative Variance" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
+          <SummaryBox label="Positive Variance" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <SummaryBox label="Variance Value" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
           <SummaryBox label="Outward Value" value={`₹ ${fmt(totals.outwardVal)}`} tone="amber" />
         </section>
 
