@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine, Radio } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, ClipboardCheck, ScanSearch, ScanLine, Radio, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
