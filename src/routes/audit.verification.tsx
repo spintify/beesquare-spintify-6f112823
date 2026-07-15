@@ -643,3 +643,12 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "ro
     </div>
   );
 }
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-[11px] uppercase tracking-widest text-sky-100/60 mb-1">{label}</span>
+      {children}
+    </label>
+  );
+}
