@@ -368,9 +368,9 @@ function VerificationPage() {
           <Stat label="SIEBEL Stock Value" value={`₹ ${fmt(totals.totalValue)}`} tone="sky" />
           <Stat label="Physical Stock Value" value={`₹ ${fmt(totals.countedVal)}`} tone="sky" />
           <Stat label="Total Outward Value" value={`₹ ${fmt(totals.outwardVal)}`} tone="amber" />
-          <Stat label="Short Value" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
-          <Stat label="Excess Value" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
-          <Stat label="Total Variance" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
+          <Stat label="Negative Variance" value={`₹ ${fmt(totals.shortVal)}`} tone="rose" />
+          <Stat label="Positive Variance" value={`₹ ${fmt(totals.excessVal)}`} tone="emerald" />
+          <Stat label="Variance Value" value={`₹ ${fmt(totals.variance)}`} tone={totals.variance >= 0 ? "emerald" : "rose"} />
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 md:p-6">
