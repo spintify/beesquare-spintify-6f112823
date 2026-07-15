@@ -389,6 +389,14 @@ function VerificationPage() {
               >
                 <ScanLine className="h-4 w-4" /> Scan (+1)
               </button>
+              <button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                disabled={!audit}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-100 hover:bg-emerald-500/20 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" /> Add Row
+              </button>
               {lastScan && (
                 <span className="text-[11px] text-sky-100/60">
                   Last: <span className="text-sky-200 font-medium">{lastScan}</span>
