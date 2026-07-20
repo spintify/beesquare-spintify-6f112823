@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts, useNavigate, useLo
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AppHeader } from "@/components/AppHeader";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { supabase } from "@/integrations/supabase/client";
 
 import appCss from "../styles.css?url";
@@ -43,9 +44,15 @@ export const Route = createRootRoute({
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b042fc85-9889-4db1-92c7-f0d2266a2d48/id-preview-122bdd45--1b0b000a-df53-44bd-8db9-faebe5963b24.lovable.app-1783064742957.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
+      { name: "theme-color", content: "#0b1220" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Spintify" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "https://res.cloudinary.com/zyywstin/image/upload/v1783064461/WhatsApp_Image_2026-07-03_at_13.04.20-removebg-preview_uwxxny.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -122,6 +129,7 @@ function RootComponent() {
       <div className="min-h-screen">
         <Outlet />
         <Toaster richColors position="top-right" />
+        <PWAInstallPrompt />
       </div>
     );
   }
@@ -137,6 +145,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Toaster richColors position="top-right" />
+        <PWAInstallPrompt />
       </div>
     );
   }
@@ -146,6 +155,7 @@ function RootComponent() {
     <div className="min-h-screen">
       <Outlet />
       <Toaster richColors position="top-right" />
+      <PWAInstallPrompt />
     </div>
   );
 }
