@@ -9,68 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SalesReportRouteImport } from './routes/sales-report'
-import { Route as PurchaseReportRouteImport } from './routes/purchase-report'
-import { Route as ProductsRouteImport } from './routes/products'
-import { Route as ModulesRouteImport } from './routes/modules'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as EstimateRouteImport } from './routes/estimate'
-import { Route as BuyersRouteImport } from './routes/buyers'
-import { Route as BillsRouteImport } from './routes/bills'
-import { Route as AuditRouteImport } from './routes/audit'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuditRouteImport } from './routes/audit'
+import { Route as BillsRouteImport } from './routes/bills'
+import { Route as BuyersRouteImport } from './routes/buyers'
+import { Route as EstimateRouteImport } from './routes/estimate'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ModulesRouteImport } from './routes/modules'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as PurchaseReportRouteImport } from './routes/purchase-report'
+import { Route as SalesReportRouteImport } from './routes/sales-report'
 import { Route as AuditIndexRouteImport } from './routes/audit.index'
-import { Route as AuditingNewAuditRouteImport } from './routes/auditing.new-audit'
-import { Route as AuditVerificationRouteImport } from './routes/audit.verification'
-import { Route as AuditSettingsRouteImport } from './routes/audit.settings'
-import { Route as AuditReportsRouteImport } from './routes/audit.reports'
-import { Route as AuditReportRouteImport } from './routes/audit.report'
-import { Route as AuditReconciliationRouteImport } from './routes/audit.reconciliation'
-import { Route as AuditInventoryRouteImport } from './routes/audit.inventory'
-import { Route as AuditInProgressRouteImport } from './routes/audit.in-progress'
-import { Route as AuditHistoryRouteImport } from './routes/audit.history'
 import { Route as AuditFinalReportRouteImport } from './routes/audit.final-report'
-import { Route as AuditingNewAuditVerifyRouteImport } from './routes/auditing.new-audit.verify'
+import { Route as AuditHistoryRouteImport } from './routes/audit.history'
+import { Route as AuditInProgressRouteImport } from './routes/audit.in-progress'
+import { Route as AuditInventoryRouteImport } from './routes/audit.inventory'
+import { Route as AuditReconciliationRouteImport } from './routes/audit.reconciliation'
+import { Route as AuditReportRouteImport } from './routes/audit.report'
+import { Route as AuditReportsRouteImport } from './routes/audit.reports'
+import { Route as AuditSettingsRouteImport } from './routes/audit.settings'
+import { Route as AuditVerificationRouteImport } from './routes/audit.verification'
+import { Route as AuditingNewAuditRouteImport } from './routes/auditing.new-audit'
 import { Route as AuditingNewAuditReviewRouteImport } from './routes/auditing.new-audit.review'
+import { Route as AuditingNewAuditVerifyRouteImport } from './routes/auditing.new-audit.verify'
 
-const SalesReportRoute = SalesReportRouteImport.update({
-  id: '/sales-report',
-  path: '/sales-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PurchaseReportRoute = PurchaseReportRouteImport.update({
-  id: '/purchase-report',
-  path: '/purchase-report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModulesRoute = ModulesRouteImport.update({
-  id: '/modules',
-  path: '/modules',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EstimateRoute = EstimateRouteImport.update({
-  id: '/estimate',
-  path: '/estimate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BuyersRoute = BuyersRouteImport.update({
-  id: '/buyers',
-  path: '/buyers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BillsRoute = BillsRouteImport.update({
-  id: '/bills',
-  path: '/bills',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuditRoute = AuditRouteImport.update({
@@ -78,9 +43,44 @@ const AuditRoute = AuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const BillsRoute = BillsRouteImport.update({
+  id: '/bills',
+  path: '/bills',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuyersRoute = BuyersRouteImport.update({
+  id: '/buyers',
+  path: '/buyers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstimateRoute = EstimateRouteImport.update({
+  id: '/estimate',
+  path: '/estimate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModulesRoute = ModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PurchaseReportRoute = PurchaseReportRouteImport.update({
+  id: '/purchase-report',
+  path: '/purchase-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalesReportRoute = SalesReportRouteImport.update({
+  id: '/sales-report',
+  path: '/sales-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuditIndexRoute = AuditIndexRouteImport.update({
@@ -88,44 +88,9 @@ const AuditIndexRoute = AuditIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuditRoute,
 } as any)
-const AuditingNewAuditRoute = AuditingNewAuditRouteImport.update({
-  id: '/auditing/new-audit',
-  path: '/auditing/new-audit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuditVerificationRoute = AuditVerificationRouteImport.update({
-  id: '/verification',
-  path: '/verification',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditSettingsRoute = AuditSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditReportsRoute = AuditReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditReportRoute = AuditReportRouteImport.update({
-  id: '/report',
-  path: '/report',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditReconciliationRoute = AuditReconciliationRouteImport.update({
-  id: '/reconciliation',
-  path: '/reconciliation',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditInventoryRoute = AuditInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => AuditRoute,
-} as any)
-const AuditInProgressRoute = AuditInProgressRouteImport.update({
-  id: '/in-progress',
-  path: '/in-progress',
+const AuditFinalReportRoute = AuditFinalReportRouteImport.update({
+  id: '/final-report',
+  path: '/final-report',
   getParentRoute: () => AuditRoute,
 } as any)
 const AuditHistoryRoute = AuditHistoryRouteImport.update({
@@ -133,19 +98,54 @@ const AuditHistoryRoute = AuditHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuditRoute,
 } as any)
-const AuditFinalReportRoute = AuditFinalReportRouteImport.update({
-  id: '/final-report',
-  path: '/final-report',
+const AuditInProgressRoute = AuditInProgressRouteImport.update({
+  id: '/in-progress',
+  path: '/in-progress',
   getParentRoute: () => AuditRoute,
 } as any)
-const AuditingNewAuditVerifyRoute = AuditingNewAuditVerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => AuditingNewAuditRoute,
+const AuditInventoryRoute = AuditInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditReconciliationRoute = AuditReconciliationRouteImport.update({
+  id: '/reconciliation',
+  path: '/reconciliation',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditReportRoute = AuditReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditReportsRoute = AuditReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditSettingsRoute = AuditSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditVerificationRoute = AuditVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AuditRoute,
+} as any)
+const AuditingNewAuditRoute = AuditingNewAuditRouteImport.update({
+  id: '/auditing/new-audit',
+  path: '/auditing/new-audit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuditingNewAuditReviewRoute = AuditingNewAuditReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => AuditingNewAuditRoute,
+} as any)
+const AuditingNewAuditVerifyRoute = AuditingNewAuditVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => AuditingNewAuditRoute,
 } as any)
 
@@ -317,60 +317,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sales-report': {
-      id: '/sales-report'
-      path: '/sales-report'
-      fullPath: '/sales-report'
-      preLoaderRoute: typeof SalesReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/purchase-report': {
-      id: '/purchase-report'
-      path: '/purchase-report'
-      fullPath: '/purchase-report'
-      preLoaderRoute: typeof PurchaseReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/modules': {
-      id: '/modules'
-      path: '/modules'
-      fullPath: '/modules'
-      preLoaderRoute: typeof ModulesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/estimate': {
-      id: '/estimate'
-      path: '/estimate'
-      fullPath: '/estimate'
-      preLoaderRoute: typeof EstimateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/buyers': {
-      id: '/buyers'
-      path: '/buyers'
-      fullPath: '/buyers'
-      preLoaderRoute: typeof BuyersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bills': {
-      id: '/bills'
-      path: '/bills'
-      fullPath: '/bills'
-      preLoaderRoute: typeof BillsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audit': {
@@ -380,11 +331,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/bills': {
+      id: '/bills'
+      path: '/bills'
+      fullPath: '/bills'
+      preLoaderRoute: typeof BillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buyers': {
+      id: '/buyers'
+      path: '/buyers'
+      fullPath: '/buyers'
+      preLoaderRoute: typeof BuyersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estimate': {
+      id: '/estimate'
+      path: '/estimate'
+      fullPath: '/estimate'
+      preLoaderRoute: typeof EstimateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modules': {
+      id: '/modules'
+      path: '/modules'
+      fullPath: '/modules'
+      preLoaderRoute: typeof ModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/purchase-report': {
+      id: '/purchase-report'
+      path: '/purchase-report'
+      fullPath: '/purchase-report'
+      preLoaderRoute: typeof PurchaseReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sales-report': {
+      id: '/sales-report'
+      path: '/sales-report'
+      fullPath: '/sales-report'
+      preLoaderRoute: typeof SalesReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audit/': {
@@ -394,60 +394,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditIndexRouteImport
       parentRoute: typeof AuditRoute
     }
-    '/auditing/new-audit': {
-      id: '/auditing/new-audit'
-      path: '/auditing/new-audit'
-      fullPath: '/auditing/new-audit'
-      preLoaderRoute: typeof AuditingNewAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/audit/verification': {
-      id: '/audit/verification'
-      path: '/verification'
-      fullPath: '/audit/verification'
-      preLoaderRoute: typeof AuditVerificationRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/settings': {
-      id: '/audit/settings'
-      path: '/settings'
-      fullPath: '/audit/settings'
-      preLoaderRoute: typeof AuditSettingsRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/reports': {
-      id: '/audit/reports'
-      path: '/reports'
-      fullPath: '/audit/reports'
-      preLoaderRoute: typeof AuditReportsRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/report': {
-      id: '/audit/report'
-      path: '/report'
-      fullPath: '/audit/report'
-      preLoaderRoute: typeof AuditReportRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/reconciliation': {
-      id: '/audit/reconciliation'
-      path: '/reconciliation'
-      fullPath: '/audit/reconciliation'
-      preLoaderRoute: typeof AuditReconciliationRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/inventory': {
-      id: '/audit/inventory'
-      path: '/inventory'
-      fullPath: '/audit/inventory'
-      preLoaderRoute: typeof AuditInventoryRouteImport
-      parentRoute: typeof AuditRoute
-    }
-    '/audit/in-progress': {
-      id: '/audit/in-progress'
-      path: '/in-progress'
-      fullPath: '/audit/in-progress'
-      preLoaderRoute: typeof AuditInProgressRouteImport
+    '/audit/final-report': {
+      id: '/audit/final-report'
+      path: '/final-report'
+      fullPath: '/audit/final-report'
+      preLoaderRoute: typeof AuditFinalReportRouteImport
       parentRoute: typeof AuditRoute
     }
     '/audit/history': {
@@ -457,25 +408,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuditHistoryRouteImport
       parentRoute: typeof AuditRoute
     }
-    '/audit/final-report': {
-      id: '/audit/final-report'
-      path: '/final-report'
-      fullPath: '/audit/final-report'
-      preLoaderRoute: typeof AuditFinalReportRouteImport
+    '/audit/in-progress': {
+      id: '/audit/in-progress'
+      path: '/in-progress'
+      fullPath: '/audit/in-progress'
+      preLoaderRoute: typeof AuditInProgressRouteImport
       parentRoute: typeof AuditRoute
     }
-    '/auditing/new-audit/verify': {
-      id: '/auditing/new-audit/verify'
-      path: '/verify'
-      fullPath: '/auditing/new-audit/verify'
-      preLoaderRoute: typeof AuditingNewAuditVerifyRouteImport
-      parentRoute: typeof AuditingNewAuditRoute
+    '/audit/inventory': {
+      id: '/audit/inventory'
+      path: '/inventory'
+      fullPath: '/audit/inventory'
+      preLoaderRoute: typeof AuditInventoryRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/audit/reconciliation': {
+      id: '/audit/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/audit/reconciliation'
+      preLoaderRoute: typeof AuditReconciliationRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/audit/report': {
+      id: '/audit/report'
+      path: '/report'
+      fullPath: '/audit/report'
+      preLoaderRoute: typeof AuditReportRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/audit/reports': {
+      id: '/audit/reports'
+      path: '/reports'
+      fullPath: '/audit/reports'
+      preLoaderRoute: typeof AuditReportsRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/audit/settings': {
+      id: '/audit/settings'
+      path: '/settings'
+      fullPath: '/audit/settings'
+      preLoaderRoute: typeof AuditSettingsRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/audit/verification': {
+      id: '/audit/verification'
+      path: '/verification'
+      fullPath: '/audit/verification'
+      preLoaderRoute: typeof AuditVerificationRouteImport
+      parentRoute: typeof AuditRoute
+    }
+    '/auditing/new-audit': {
+      id: '/auditing/new-audit'
+      path: '/auditing/new-audit'
+      fullPath: '/auditing/new-audit'
+      preLoaderRoute: typeof AuditingNewAuditRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auditing/new-audit/review': {
       id: '/auditing/new-audit/review'
       path: '/review'
       fullPath: '/auditing/new-audit/review'
       preLoaderRoute: typeof AuditingNewAuditReviewRouteImport
+      parentRoute: typeof AuditingNewAuditRoute
+    }
+    '/auditing/new-audit/verify': {
+      id: '/auditing/new-audit/verify'
+      path: '/verify'
+      fullPath: '/auditing/new-audit/verify'
+      preLoaderRoute: typeof AuditingNewAuditVerifyRouteImport
       parentRoute: typeof AuditingNewAuditRoute
     }
   }
