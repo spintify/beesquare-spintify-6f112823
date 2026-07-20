@@ -22,7 +22,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [companyId, setCompanyId] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,10 +35,6 @@ function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!companyId.trim()) {
-      toast.error("Company ID is required");
-      return;
-    }
     setLoading(true);
     try {
       let tokens;
@@ -79,17 +74,6 @@ function LoginPage() {
             <h1 className="text-xl font-semibold tracking-tight">{BRAND.name}</h1>
             <p className="text-xs text-muted-foreground">Secure enterprise access</p>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="companyId">Company ID</Label>
-          <Input
-            id="companyId"
-            value={companyId}
-            onChange={(e) => setCompanyId(e.target.value)}
-            placeholder="Enter Company ID"
-            autoComplete="organization"
-            required
-          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="userid">Username</Label>
@@ -133,8 +117,8 @@ function LoginPage() {
           <DialogHeader>
             <DialogTitle>Reset your password</DialogTitle>
             <DialogDescription>
-              Please contact your Spintify administrator to reset the password for your Company ID. For
-              security, password resets are handled offline.
+              Please contact your Spintify administrator to reset your password. For security, password
+              resets are handled offline.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
