@@ -129,6 +129,7 @@ function RootComponent() {
       <div className="min-h-screen">
         <Outlet />
         <Toaster richColors position="top-right" />
+        <PWAInstallPrompt />
       </div>
     );
   }
@@ -144,6 +145,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Toaster richColors position="top-right" />
+        <PWAInstallPrompt />
       </div>
     );
   }
@@ -153,6 +155,7 @@ function RootComponent() {
     <div className="min-h-screen">
       <Outlet />
       <Toaster richColors position="top-right" />
+      <PWAInstallPrompt />
     </div>
   );
 }
