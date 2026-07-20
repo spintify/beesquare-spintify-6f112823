@@ -1,0 +1,25 @@
+{
+  "name": "Spintify — Billing & Auditing",
+  "short_name": "Spintify",
+  "description": "Complete billing & auditing for OEM parts dealers",
+  "start_url": "/modules",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/zyywstin/image/upload/v1783064461/WhatsApp_Image_2026-07-03_at_13.04.20-removebg-preview_uwxxny.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/zyywstin/image/upload/v1783064461/WhatsApp_Image_2026-07-03_at_13.04.20-removebg-preview_uwxxny.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
